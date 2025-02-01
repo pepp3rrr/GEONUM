@@ -11,39 +11,26 @@ impl Bezier {
 
     pub fn compute(&self, t: f32) -> Point {
         Self::compute_woker(t, self.control.clone())
-            .pop()
-            .expect("Should not be empty")
     }
 
-    fn compute_woker(t: f32, control: Vec<Point>) -> Vec<Point> {
-        let mut iter = control.into_iter();
+    fn compute_woker(t: f32, mut control: Vec<Point>) -> Point {
+        let n = control.len();
+
+        if n == 1 {
+            return control.pop().expect("Should not be empty");
+        }
+
         let mut new = Vec::<Point>::new();
+        for k in 1..n {
+            let a = control.get(k - 1).unwrap().clone();
+            let b = control.get(k).unwrap().clone();
 
-        let mut prev: Option<Point> = None;
-        loop {
-            let a = match prev {
-                Some(prev) => prev,
-                None => {
-                    let first = iter.next().expect("Received empty control list");
-                    first
-                }
-            };
-
-            match iter.next() {
-                Some(b) => {
-                    let coord = a + (b - a) * t;
-                    new.push(coord);
-
-                    prev = Some(b);
-                }
-                None => break,
-            };
+            // (1-t)a + tb <=> a -ta + tb <=> a + t(b - a)
+            // This form respects point and vec operation rules
+            let coord = a + (b - a) * t;
+            new.push(coord);
         }
 
-        if new.len() > 1 {
-            Self::compute_woker(t, new)
-        } else {
-            new
-        }
+        Self::compute_woker(t, new)
     }
 }
