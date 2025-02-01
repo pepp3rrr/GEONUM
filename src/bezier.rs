@@ -3,7 +3,7 @@ use std::{fs::File, path::Path};
 use crate::types::*;
 
 pub struct Bezier {
-    control: Vec<Point>,
+    pub control: Vec<Point>,
 }
 
 impl Bezier {
