@@ -1,5 +1,5 @@
 use clap::Parser;
-use plotters::prelude::*;
+use plotters::{element::DashedPathElement, prelude::*};
 
 mod bezier;
 mod types;
@@ -20,6 +20,10 @@ struct Args {
     /// Number of datapoints to sample
     #[arg(short, long, default_value_t = 100)]
     samples: u16,
+
+    /// Wether to draw intermediate control polygons
+    #[arg(short, long)]
+    draw_control: bool,
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -49,6 +53,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }),
         &RED,
     ))?;
+
+    if args.draw_control {
+        root.draw(&DashedPathElement::new(
+            bezier
+                .control
+                .iter()
+                .map(|p| chart.backend_coord(&(p.x, p.y))),
+            4,
+            2,
+            &full_palette::GREY_A700,
+        ))?;
+    }
 
     chart
         .configure_series_labels()
