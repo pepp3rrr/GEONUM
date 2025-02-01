@@ -1,16 +1,34 @@
+use clap::Parser;
 use plotters::prelude::*;
 
 mod bezier;
 mod types;
 
 use bezier::Bezier;
-use types::*;
+
+#[derive(Parser, Debug)]
+#[command(version, about, long_about = None)]
+struct Args {
+    /// The path of the BCV file to plot
+    #[arg()]
+    bcv_path: String,
+
+    /// The output path of the plotted image
+    #[arg(short, long)]
+    output: String,
+
+    /// Number of datapoints to sample
+    #[arg(short, long, default_value_t = 100)]
+    samples: u16,
+}
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let bezier = Bezier::from_csv("data/simple.bcv");
+    let args = Args::parse();
+
+    let bezier = Bezier::from_csv(args.bcv_path);
     let bb = bezier.bounding_box();
 
-    let root = BitMapBackend::new("/tmp/0.png", (640, 480)).into_drawing_area();
+    let root = BitMapBackend::new(&args.output, (640, 480)).into_drawing_area();
     root.fill(&WHITE)?;
 
     let mut chart = ChartBuilder::on(&root)
@@ -23,10 +41,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     chart.configure_mesh().draw()?;
 
     chart.draw_series(LineSeries::new(
-        (-50..=50).map(|x| x as f32 / 50.0).map(|x| {
-            let result = bezier.compute(x);
-            (result.x, result.y)
-        }),
+        (0..=args.samples)
+            .map(|x| x as f32 / (args.samples as f32))
+            .map(|x| {
+                let result = bezier.compute(x);
+                (result.x, result.y)
+            }),
         &RED,
     ))?;
 
