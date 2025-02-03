@@ -15,3 +15,7 @@ cargo run -p tp1-bezier -- -h
 cargo run -p tp1-bezier -- -o plot.png tp1/data/simple.bcv
 ```
 
+## Contributeurs
+
+ - Gaspard Culis
+ - Maxim Frolov
