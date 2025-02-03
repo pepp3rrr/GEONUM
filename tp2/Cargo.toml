@@ -4,5 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+blue_engine = "0.6.2"
 geonum-common = { path = "../common" }
 tp1-bezier = { path = "../tp1" }
