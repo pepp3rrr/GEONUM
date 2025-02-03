@@ -1,0 +1,8 @@
+[package]
+name = "tp2-splines"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+geonum-common = { path = "../common" }
+tp1-bezier = { path = "../tp1" }
