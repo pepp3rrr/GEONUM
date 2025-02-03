@@ -1,0 +1,10 @@
+[package]
+name = "tp1-bezier"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+geonum-common = { path = "../common" }
+clap = { workspace = true }
+csv = { workspace = true }
+plotters = { workspace = true }

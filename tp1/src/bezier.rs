@@ -1,6 +1,6 @@
 use std::{fs::File, path::Path};
 
-use crate::types::*;
+use geonum_common::*;
 
 pub struct Bezier {
     pub control: Vec<Point>,

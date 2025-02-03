@@ -1,10 +1,7 @@
 use clap::Parser;
 use plotters::{element::DashedPathElement, prelude::*};
 
-mod bezier;
-mod types;
-
-use bezier::Bezier;
+use tp1_bezier::Bezier;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
