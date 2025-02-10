@@ -26,7 +26,7 @@ struct Args {
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
 
-    let bezier = Bezier::from_csv(args.bcv_path);
+    let bezier = Bezier::from_csv(&args.bcv_path);
     let bb = bezier.bounding_box();
 
     let root = BitMapBackend::new(&args.output, (640, 480)).into_drawing_area();
@@ -41,15 +41,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     chart.configure_mesh().draw()?;
 
-    chart.draw_series(LineSeries::new(
-        (0..=args.samples)
-            .map(|x| x as f32 / (args.samples as f32))
-            .map(|x| {
-                let result = bezier.compute(x);
-                (result.x, result.y)
-            }),
-        &RED,
-    ))?;
+    chart
+        .draw_series(LineSeries::new(
+            (0..=args.samples)
+                .map(|x| x as f32 / (args.samples as f32))
+                .map(|x| {
+                    let result = bezier.compute(x);
+                    (result.x, result.y)
+                }),
+            &RED,
+        ))?
+        .label(args.bcv_path);
 
     if args.draw_control {
         root.draw(&DashedPathElement::new(
@@ -65,6 +67,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     chart
         .configure_series_labels()
+        .legend_area_size(0)
         .background_style(&WHITE.mix(0.8))
         .border_style(&BLACK)
         .draw()?;
