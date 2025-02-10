@@ -799,7 +799,6 @@ name = "tp1-bezier"
 version = "0.1.0"
 dependencies = [
  "clap",
- "csv",
  "geonum-common",
  "plotters",
 ]

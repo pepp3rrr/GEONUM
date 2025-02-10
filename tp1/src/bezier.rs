@@ -9,11 +9,7 @@ impl Bezier {
         Self { control }
     }
 
-    pub fn compute(&self, t: f32) -> Point {
-        Self::compute_woker(t, self.control.clone())
-    }
-
-    fn compute_woker(t: f32, mut control: Vec<Point>) -> Point {
+    fn compute(t: f32, mut control: Vec<Point>) -> Point {
         let n = control.len();
 
         if n == 1 {
@@ -31,10 +27,37 @@ impl Bezier {
             new.push(coord);
         }
 
-        Self::compute_woker(t, new)
+        Self::compute(t, new)
+    }
+}
+
+impl FromCSV for Bezier {
+    fn read(mut reader: CSVReader) -> Self {
+        let control = reader
+            .records()
+            .map(|result| {
+                let record = result.expect("Failed to read record");
+
+                let x_str = record.get(0).unwrap();
+                let y_str = record.get(1).unwrap();
+
+                let x = x_str.parse().unwrap();
+                let y = y_str.parse().unwrap();
+
+                Point::new(x, y)
+            })
+            .collect();
+
+        Self { control }
+    }
+}
+
+impl Plot for Bezier {
+    fn sample(&self, t: f32) -> Point {
+        Self::compute(t, self.control.clone())
     }
 
-    pub fn bounding_box(&self) -> (Point, Point) {
+    fn bounding_box(&self) -> (Point, Point) {
         let right = self
             .control
             .iter()
@@ -61,26 +84,5 @@ impl Bezier {
             .unwrap();
 
         (Point::new(left, bottom), Point::new(right, top))
-    }
-}
-
-impl FromCSV for Bezier {
-    fn read(mut reader: CSVReader) -> Self {
-        let control = reader
-            .records()
-            .map(|result| {
-                let record = result.expect("Failed to read record");
-
-                let x_str = record.get(0).unwrap();
-                let y_str = record.get(1).unwrap();
-
-                let x = x_str.parse().unwrap();
-                let y = y_str.parse().unwrap();
-
-                Point::new(x, y)
-            })
-            .collect();
-
-        Self { control }
     }
 }
