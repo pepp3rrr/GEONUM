@@ -1,6 +1,6 @@
 use clap::Parser;
 use geonum_common::{FromCSV as _, Plot as _};
-use plotters::prelude::*;
+use plotters::{element::DashedPathElement, prelude::*};
 
 mod spline;
 
@@ -20,6 +20,10 @@ struct Args {
     /// Number of datapoints to sample
     #[arg(short, long, default_value_t = 200)]
     samples: u16,
+
+    /// Wether to draw intermediate control polygons
+    #[arg(short, long)]
+    draw_control: bool,
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -28,11 +32,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let spline = BezierSpline::from_csv(args.bcv_path);
     let bb = spline.bounding_box();
 
-    let root = BitMapBackend::new(&args.output, (1080, 720)).into_drawing_area();
+    let root = BitMapBackend::new(&args.output, (640, 480)).into_drawing_area();
     root.fill(&WHITE)?;
 
     let mut chart = ChartBuilder::on(&root)
-        .caption("Bezier curve", ("sans-serif", 50).into_font())
+        .caption("Bezier spline", ("sans-serif", 50).into_font())
         .margin(5)
         .x_label_area_size(30)
         .y_label_area_size(30)
@@ -57,8 +61,23 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         }),
                     &colors.get(index % colors.len()).unwrap(),
                 ))
-                .expect("Failed to plot sub bezier");
+                .unwrap();
         });
+
+    if args.draw_control {
+        spline.curves.iter().for_each(|bezier| {
+            root.draw(&DashedPathElement::new(
+                bezier
+                    .control
+                    .iter()
+                    .map(|p| chart.backend_coord(&(p.x, p.y))),
+                4,
+                2,
+                &full_palette::GREY_A700,
+            ))
+            .unwrap();
+        });
+    }
 
     chart
         .configure_series_labels()
