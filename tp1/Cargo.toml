@@ -6,5 +6,4 @@ edition = "2021"
 [dependencies]
 geonum-common = { path = "../common" }
 clap = { workspace = true }
-csv = { workspace = true }
 plotters = { workspace = true }

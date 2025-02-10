@@ -405,6 +405,9 @@ dependencies = [
 [[package]]
 name = "geonum-common"
 version = "0.1.0"
+dependencies = [
+ "csv",
+]
 
 [[package]]
 name = "getrandom"

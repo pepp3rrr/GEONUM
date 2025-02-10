@@ -1,5 +1,3 @@
-use std::{fs::File, path::Path};
-
 use geonum_common::*;
 
 pub struct Bezier {
@@ -36,32 +34,6 @@ impl Bezier {
         Self::compute_woker(t, new)
     }
 
-    pub fn from_csv<P: AsRef<Path>>(path: P) -> Self {
-        let file_reader = File::open(path).expect("Failed to read from CSV");
-        let mut rdr = csv::ReaderBuilder::new()
-            .trim(csv::Trim::All)
-            .delimiter(b',')
-            .flexible(true)
-            .from_reader(file_reader);
-
-        let control = rdr
-            .records()
-            .map(|result| {
-                let record = result.expect("Failed to read record");
-
-                let x_str = record.get(0).unwrap();
-                let y_str = record.get(1).unwrap();
-
-                let x = x_str.parse().unwrap();
-                let y = y_str.parse().unwrap();
-
-                Point::new(x, y)
-            })
-            .collect();
-
-        Self { control }
-    }
-
     pub fn bounding_box(&self) -> (Point, Point) {
         let right = self
             .control
@@ -89,5 +61,26 @@ impl Bezier {
             .unwrap();
 
         (Point::new(left, bottom), Point::new(right, top))
+    }
+}
+
+impl FromCSV for Bezier {
+    fn read(mut reader: CSVReader) -> Self {
+        let control = reader
+            .records()
+            .map(|result| {
+                let record = result.expect("Failed to read record");
+
+                let x_str = record.get(0).unwrap();
+                let y_str = record.get(1).unwrap();
+
+                let x = x_str.parse().unwrap();
+                let y = y_str.parse().unwrap();
+
+                Point::new(x, y)
+            })
+            .collect();
+
+        Self { control }
     }
 }

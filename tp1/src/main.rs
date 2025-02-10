@@ -1,4 +1,5 @@
 use clap::Parser;
+use geonum_common::FromCSV as _;
 use plotters::{element::DashedPathElement, prelude::*};
 
 use tp1_bezier::Bezier;
