@@ -17,7 +17,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Install dependencies
-      run: sudo apt-get install fontconfig
+      run: sudo apt-get install pkg-config fontconfig
     - name: Build
       run: cargo build --verbose
     - name: Run tests
