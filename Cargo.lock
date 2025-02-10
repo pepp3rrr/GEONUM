@@ -405,6 +405,9 @@ dependencies = [
 [[package]]
 name = "geonum-common"
 version = "0.1.0"
+dependencies = [
+ "csv",
+]
 
 [[package]]
 name = "getrandom"
@@ -796,16 +799,17 @@ name = "tp1-bezier"
 version = "0.1.0"
 dependencies = [
  "clap",
- "csv",
  "geonum-common",
  "plotters",
 ]
 
 [[package]]
-name = "tp2-splines"
+name = "tp2-spline"
 version = "0.1.0"
 dependencies = [
+ "clap",
  "geonum-common",
+ "plotters",
  "tp1-bezier",
 ]
 

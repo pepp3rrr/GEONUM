@@ -1,5 +1,3 @@
-use std::{fs::File, path::Path};
-
 use geonum_common::*;
 
 pub struct Bezier {
@@ -11,11 +9,7 @@ impl Bezier {
         Self { control }
     }
 
-    pub fn compute(&self, t: f32) -> Point {
-        Self::compute_woker(t, self.control.clone())
-    }
-
-    fn compute_woker(t: f32, mut control: Vec<Point>) -> Point {
+    fn compute(t: f32, mut control: Vec<Point>) -> Point {
         let n = control.len();
 
         if n == 1 {
@@ -33,18 +27,13 @@ impl Bezier {
             new.push(coord);
         }
 
-        Self::compute_woker(t, new)
+        Self::compute(t, new)
     }
+}
 
-    pub fn from_csv<P: AsRef<Path>>(path: P) -> Self {
-        let file_reader = File::open(path).expect("Failed to read from CSV");
-        let mut rdr = csv::ReaderBuilder::new()
-            .trim(csv::Trim::All)
-            .delimiter(b',')
-            .flexible(true)
-            .from_reader(file_reader);
-
-        let control = rdr
+impl FromCSV for Bezier {
+    fn read(mut reader: CSVReader) -> Self {
+        let control = reader
             .records()
             .map(|result| {
                 let record = result.expect("Failed to read record");
@@ -61,8 +50,14 @@ impl Bezier {
 
         Self { control }
     }
+}
 
-    pub fn bounding_box(&self) -> (Point, Point) {
+impl Plot for Bezier {
+    fn sample(&self, t: f32) -> Point {
+        Self::compute(t, self.control.clone())
+    }
+
+    fn bounding_box(&self) -> (Point, Point) {
         let right = self
             .control
             .iter()

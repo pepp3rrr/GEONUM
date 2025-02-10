@@ -1,8 +1,10 @@
 [package]
-name = "tp2-splines"
+name = "tp2-spline"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 geonum-common = { path = "../common" }
 tp1-bezier = { path = "../tp1" }
+clap = { workspace = true }
+plotters = { workspace = true }

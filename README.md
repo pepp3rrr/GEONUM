@@ -11,6 +11,7 @@ Chaque TP est développé dans son propre module Rust, et peut dépendre de TPs 
 Pour exécuter le code d'un TP, on a besoin de son nom de module :
 
  - [TP1](./tp1) : `tp1-bezier`
+ - [TP2](./tp2) : `tp2-spline`
 
 Que l'on utilise dans la commande
 

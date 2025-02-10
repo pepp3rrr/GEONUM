@@ -1,4 +1,5 @@
 use clap::Parser;
+use geonum_common::{FromCSV as _, Plot as _};
 use plotters::{element::DashedPathElement, prelude::*};
 
 use tp1_bezier::Bezier;
@@ -46,7 +47,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             (0..=args.samples)
                 .map(|x| x as f32 / (args.samples as f32))
                 .map(|x| {
-                    let result = bezier.compute(x);
+                    let result = bezier.sample(x);
                     (result.x, result.y)
                 }),
             &RED,
