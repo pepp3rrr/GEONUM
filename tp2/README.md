@@ -21,7 +21,11 @@ cargo run -p tp2-spline -- -s 1000 -o plot.png tp2/data/simple.bcv
 
 ![spiral.bcv](https://github.com/user-attachments/assets/4b6e28fb-272e-49b7-9197-fc1bf440c674)
 
+### Changement de position initiale
 
+Si on change la position initiale de $b^0_1$ de $0.5(p_0+p_1)$ à $0.1(p_0+p_1)$, on observe que les angles entre les différentes courbes de bezier deviennent moins ronds :
+
+![semi-tweaked.bcv](https://github.com/user-attachments/assets/60e1d39b-2ea7-447d-8d5c-a88ce1d1b74e)
 
 
 
