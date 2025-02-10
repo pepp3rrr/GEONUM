@@ -76,6 +76,23 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 &full_palette::GREY_A700,
             ))
             .unwrap();
+
+            bezier
+                .control
+                .iter()
+                .enumerate()
+                .for_each(|(index, point)| {
+                    root.draw(&Circle::new(
+                        chart.backend_coord(&(point.x, point.y)),
+                        if index == 0 || index == (bezier.control.len() - 1) {
+                            5
+                        } else {
+                            3
+                        },
+                        Into::<ShapeStyle>::into(&BLACK).filled(),
+                    ))
+                    .unwrap();
+                });
         });
     }
 
