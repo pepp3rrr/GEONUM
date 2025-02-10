@@ -804,7 +804,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "tp2-splines"
+name = "tp2-spline"
 version = "0.1.0"
 dependencies = [
  "clap",
