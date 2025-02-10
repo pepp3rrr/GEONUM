@@ -4,15 +4,18 @@
 
 Le SDK Rust est nécéssaire à l'exéctution du projet. Pour son installation je recommande [Rustup](https://rustup.rs/).
 
-## Exécution
+## TPS
 
-### TP1
+Chaque TP est développé dans son propre module Rust, et peut dépendre de TPs précédents. Le module [common](./common) contient les types de base (Point, Vecteur) et quelques utilités communes.
+
+Pour exécuter le code d'un TP, on a besoin de son nom de module :
+
+ - [TP1](./tp1) : `tp1-bezier`
+
+Que l'on utilise dans la commande
 
 ```sh
-# Afficher les options CLI
-cargo run -p tp1-bezier -- -h
-# Génération de plot
-cargo run -p tp1-bezier -- -o plot.png tp1/data/simple.bcv
+cargo run -p nom-de-module -- flags_dexecution
 ```
 
 ## Contributeurs
