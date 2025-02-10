@@ -32,7 +32,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let spline = BezierSpline::from_csv(args.bcv_path);
     let bb = spline.bounding_box();
 
-    let root = SVGBackend::new(&args.output, (640, 480)).into_drawing_area();
+    let root = SVGBackend::new(&args.output, (1080, 720)).into_drawing_area();
     root.fill(&WHITE)?;
 
     let mut chart = ChartBuilder::on(&root)

@@ -30,7 +30,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let bezier = Bezier::from_csv(&args.bcv_path);
     let bb = bezier.bounding_box();
 
-    let root = SVGBackend::new(&args.output, (640, 480)).into_drawing_area();
+    let root = SVGBackend::new(&args.output, (1080, 720)).into_drawing_area();
     root.fill(&WHITE)?;
 
     let mut chart = ChartBuilder::on(&root)
