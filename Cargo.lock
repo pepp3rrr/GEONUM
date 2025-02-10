@@ -807,7 +807,9 @@ dependencies = [
 name = "tp2-splines"
 version = "0.1.0"
 dependencies = [
+ "clap",
  "geonum-common",
+ "plotters",
  "tp1-bezier",
 ]
 
