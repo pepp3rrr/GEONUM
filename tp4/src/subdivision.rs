@@ -1,11 +1,12 @@
 use geonum_common::{FromCSV, Point};
 
+#[derive(Clone)]
 pub struct SubdivisionCurve {
-    control: Vec<Point>,
+    pub control: Vec<Point>,
 }
 
 impl SubdivisionCurve {
-    pub fn compute_chaikin(self, steps: u32) -> Vec<Point> {
+    pub fn compute_chaikin(self, steps: u16) -> Vec<Point> {
         if steps == 0 {
             return self.control;
         }
