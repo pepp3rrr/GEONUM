@@ -814,6 +814,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "tp4-subdivision"
+version = "0.1.0"
+dependencies = [
+ "geonum-common",
+]
+
+[[package]]
 name = "ttf-parser"
 version = "0.20.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
