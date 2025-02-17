@@ -21,9 +21,7 @@ impl Bezier {
             let a = control.get(k - 1).unwrap().clone();
             let b = control.get(k).unwrap().clone();
 
-            // (1-t)a + tb <=> a -ta + tb <=> a + t(b - a)
-            // This form respects point and vec operation rules
-            let coord = a + (b - a) * t;
+            let coord = ((1.0 - t) * a + t * b).into_point();
             new.push(coord);
         }
 
