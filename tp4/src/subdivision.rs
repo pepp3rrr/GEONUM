@@ -46,7 +46,7 @@ impl SubdivisionCurve {
 
         assert_eq!(new.len(), 2 * n);
 
-        SubdivisionCurve { control: new }.compute_chaikin(steps - 1)
+        SubdivisionCurve { control: new }.compute_corner_cutting(steps - 1, a, b)
     }
 }
 
