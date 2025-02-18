@@ -1,5 +1,5 @@
 use clap::Parser;
-use geonum_common::FromCSV;
+use geonum_common::{BoundingBox as _, FromCSV};
 use plotters::{element::DashedPathElement, prelude::*};
 use subdivision::SubdivisionCurve;
 
@@ -30,6 +30,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let subdivision = SubdivisionCurve::from_csv(&args.data_path);
     let points = subdivision.clone().compute_chaikin(args.steps);
+    let bb = subdivision.bounding_box();
 
     let root = SVGBackend::new(&args.output, (1080, 720)).into_drawing_area();
     root.fill(&WHITE)?;
@@ -39,7 +40,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .margin(5)
         .x_label_area_size(30)
         .y_label_area_size(30)
-        .build_cartesian_2d(0.0f32..2.0f32, 0.0f32..2.0f32)?;
+        .build_cartesian_2d(bb.0.x..bb.1.x, bb.0.y..bb.1.y)?;
 
     chart.configure_mesh().draw()?;
 

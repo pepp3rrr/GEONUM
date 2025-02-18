@@ -1,4 +1,4 @@
-use geonum_common::{FromCSV, Point};
+use geonum_common::{BoundingBox, FromCSV, Point};
 
 #[derive(Clone)]
 pub struct SubdivisionCurve {
@@ -65,5 +65,11 @@ impl FromCSV for SubdivisionCurve {
         control.push(control.first().cloned().expect("Should not be empty"));
 
         Self { control }
+    }
+}
+
+impl BoundingBox for SubdivisionCurve {
+    fn bounding_box(&self) -> (Point, Point) {
+        self.control.bounding_box()
     }
 }
