@@ -14,6 +14,13 @@ impl SubdivisionCurve {
         let n = self.control.len();
         let mut new = Vec::<Point>::with_capacity(2 * n);
 
+        new.push(
+            self.control
+                .first()
+                .cloned()
+                .expect("Control vec should not be empty"),
+        );
+
         self.control.windows(2).for_each(|k| {
             let [xi, xi_1]: [Point; 2] = k.try_into().expect("Should be size 2");
 
@@ -24,13 +31,22 @@ impl SubdivisionCurve {
             new.push(x2i_1);
         });
 
+        new.push(
+            self.control
+                .last()
+                .cloned()
+                .expect("Control vec should not be empty"),
+        );
+
+        assert_eq!(new.len(), 2 * n);
+
         SubdivisionCurve { control: new }.compute_chaikin(steps - 1)
     }
 }
 
 impl FromCSV for SubdivisionCurve {
     fn read(mut reader: geonum_common::CSVReader) -> Self {
-        let control = reader
+        let mut control: Vec<_> = reader
             .records()
             .map(|result| {
                 let record = result.expect("Failed to read record");
@@ -44,6 +60,9 @@ impl FromCSV for SubdivisionCurve {
                 Point::new(x, y)
             })
             .collect();
+
+        // Closed polygon hack
+        control.push(control.first().cloned().expect("Should not be empty"));
 
         Self { control }
     }
