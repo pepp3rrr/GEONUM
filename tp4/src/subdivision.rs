@@ -7,6 +7,12 @@ pub struct SubdivisionCurve {
 
 impl SubdivisionCurve {
     pub fn compute_chaikin(self, steps: u16) -> Vec<Point> {
+        self.compute_corner_cutting(steps, 0.25, 0.75)
+    }
+
+    pub fn compute_corner_cutting(self, steps: u16, a: f32, b: f32) -> Vec<Point> {
+        assert!(0.0 < a && a < b && b < 1.0);
+
         if steps == 0 {
             return self.control;
         }
@@ -24,8 +30,8 @@ impl SubdivisionCurve {
         self.control.windows(2).for_each(|k| {
             let [xi, xi_1]: [Point; 2] = k.try_into().expect("Should be size 2");
 
-            let x2i = (3. / 4. * xi + 1. / 4. * xi_1).into_point();
-            let x2i_1 = (1. / 4. * xi + 3. / 4. * xi_1).into_point();
+            let x2i = ((1. - a) * xi + a * xi_1).into_point();
+            let x2i_1 = ((1. - b) * xi + b * xi_1).into_point();
 
             new.push(x2i);
             new.push(x2i_1);
