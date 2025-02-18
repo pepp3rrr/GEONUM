@@ -54,7 +54,9 @@ impl Plot for Bezier {
     fn sample(&self, t: f32) -> Point {
         Self::compute(t, self.control.clone())
     }
+}
 
+impl BoundingBox for Bezier {
     fn bounding_box(&self) -> (Point, Point) {
         let right = self
             .control
