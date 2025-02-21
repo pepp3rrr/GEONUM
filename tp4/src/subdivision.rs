@@ -8,7 +8,7 @@ pub struct SubdivisionCurve {
 pub enum ComputeMethod {
     Chaikin,
     CornerCutting { a: f32, b: f32 },
-    FourPoint,
+    FourPoint { w: f32 },
 }
 
 impl SubdivisionCurve {
@@ -18,8 +18,8 @@ impl SubdivisionCurve {
         match method {
             ComputeMethod::Chaikin => worker.compute_chaikin(steps),
             ComputeMethod::CornerCutting { a, b } => worker.compute_corner_cutting(steps, a, b),
-            ComputeMethod::FourPoint => {
-                let mut out = worker.compute_four_point(steps);
+            ComputeMethod::FourPoint { w } => {
+                let mut out = worker.compute_four_point(steps, w);
                 // Closed polygon hack
                 out.push(out.first().cloned().unwrap());
                 out
@@ -57,7 +57,7 @@ impl SubdivisionCurve {
         SubdivisionCurve { control: new }.compute_corner_cutting(steps - 1, a, b)
     }
 
-    fn compute_four_point(self, steps: u16) -> Vec<Point> {
+    fn compute_four_point(self, steps: u16, w: f32) -> Vec<Point> {
         if steps == 0 {
             return self.control;
         }
@@ -76,7 +76,8 @@ impl SubdivisionCurve {
             let xi_p2 = self.control[(i + 2) % n];
 
             let x2i = xi;
-            let x2i_1 = (1. / 16. * (-1. * xi_m1 + 9. * xi + 9. * xi_p1 - 1. * xi_p2)).into_point();
+            let x2i_1 =
+                (-w * xi_m1 + (1. / 2. + w) * xi + (1. / 2. + w) * xi_p1 - w * xi_p2).into_point();
 
             new.push(x2i);
             new.push(x2i_1);
@@ -84,7 +85,7 @@ impl SubdivisionCurve {
 
         assert_eq!(new.len(), 2 * n);
 
-        SubdivisionCurve { control: new }.compute_four_point(steps - 1)
+        SubdivisionCurve { control: new }.compute_four_point(steps - 1, w)
     }
 }
 

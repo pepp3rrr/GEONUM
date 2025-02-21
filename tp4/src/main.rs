@@ -35,6 +35,10 @@ struct Args {
     /// Beta parameter for corner-cutting method
     #[arg(short, long, default_value_t = 0.6)]
     beta: f32,
+
+    /// Omega parameter for four-point method (default 1/16)
+    #[arg(long, default_value_t = 1./16.)]
+    omega: f32,
 }
 
 #[derive(ValueEnum, Default, Debug, Clone, serde::Serialize)]
@@ -55,7 +59,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             a: args.alpha,
             b: args.beta,
         },
-        Method::FourPoint => ComputeMethod::FourPoint,
+        Method::FourPoint => ComputeMethod::FourPoint { w: args.omega },
     };
     let subdivision = SubdivisionCurve::from_csv(&args.data_path);
     let points = subdivision.clone().compute(method, args.steps);
