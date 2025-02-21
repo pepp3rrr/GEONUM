@@ -1,7 +1,7 @@
 use clap::Parser;
 use geonum_common::{BoundingBox as _, FromCSV};
 use plotters::{element::DashedPathElement, prelude::*};
-use subdivision::SubdivisionCurve;
+use subdivision::{ComputeMethod, SubdivisionCurve};
 
 mod subdivision;
 
@@ -29,8 +29,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
 
     let subdivision = SubdivisionCurve::from_csv(&args.data_path);
-    let points = subdivision.clone().compute_chaikin(args.steps);
-    let bb = subdivision.bounding_box();
+    let points = subdivision
+        .clone()
+        .compute(ComputeMethod::FourPoint, args.steps);
+    let bb = points.bounding_box();
 
     let root = SVGBackend::new(&args.output, (1080, 720)).into_drawing_area();
     root.fill(&WHITE)?;

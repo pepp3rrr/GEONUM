@@ -5,12 +5,42 @@ pub struct SubdivisionCurve {
     pub control: Vec<Point>,
 }
 
+pub enum ComputeMethod {
+    Chaikin,
+    CornerCutting { a: f32, b: f32 },
+    FourPoint,
+}
+
 impl SubdivisionCurve {
-    pub fn compute_chaikin(self, steps: u16) -> Vec<Point> {
+    pub fn compute(&self, method: ComputeMethod, steps: u16) -> Vec<Point> {
+        let mut worker = self.clone();
+
+        match method {
+            ComputeMethod::Chaikin => {
+                worker
+                    .control
+                    .push(worker.control.first().cloned().unwrap());
+                worker.compute_chaikin(steps)
+            }
+            ComputeMethod::CornerCutting { a, b } => {
+                worker
+                    .control
+                    .push(worker.control.first().cloned().unwrap());
+                worker.compute_corner_cutting(steps, a, b)
+            }
+            ComputeMethod::FourPoint => {
+                let mut out = worker.compute_four_point(steps);
+                out.push(out.first().cloned().unwrap());
+                out
+            }
+        }
+    }
+
+    fn compute_chaikin(self, steps: u16) -> Vec<Point> {
         self.compute_corner_cutting(steps, 0.25, 0.75)
     }
 
-    pub fn compute_corner_cutting(self, steps: u16, a: f32, b: f32) -> Vec<Point> {
+    fn compute_corner_cutting(self, steps: u16, a: f32, b: f32) -> Vec<Point> {
         assert!(0.0 < a && a < b && b < 1.0);
 
         if steps == 0 {
@@ -48,11 +78,41 @@ impl SubdivisionCurve {
 
         SubdivisionCurve { control: new }.compute_corner_cutting(steps - 1, a, b)
     }
+
+    fn compute_four_point(self, steps: u16) -> Vec<Point> {
+        if steps == 0 {
+            return self.control;
+        }
+
+        let n = self.control.len();
+        let mut new = Vec::<Point>::with_capacity(2 * n);
+
+        for i in 0..n {
+            let xi_m1 = if i != 0 {
+                self.control[i - 1]
+            } else {
+                self.control[n - 1]
+            };
+            let xi = self.control[i];
+            let xi_p1 = self.control[(i + 1) % n];
+            let xi_p2 = self.control[(i + 2) % n];
+
+            let x2i = xi;
+            let x2i_1 = (1. / 16. * (-1. * xi_m1 + 9. * xi + 9. * xi_p1 - 1. * xi_p2)).into_point();
+
+            new.push(x2i);
+            new.push(x2i_1);
+        }
+
+        assert_eq!(new.len(), 2 * n);
+
+        SubdivisionCurve { control: new }.compute_four_point(steps - 1)
+    }
 }
 
 impl FromCSV for SubdivisionCurve {
     fn read(mut reader: geonum_common::CSVReader) -> Self {
-        let mut control: Vec<_> = reader
+        let control: Vec<_> = reader
             .records()
             .map(|result| {
                 let record = result.expect("Failed to read record");
@@ -66,9 +126,6 @@ impl FromCSV for SubdivisionCurve {
                 Point::new(x, y)
             })
             .collect();
-
-        // Closed polygon hack
-        control.push(control.first().cloned().expect("Should not be empty"));
 
         Self { control }
     }
