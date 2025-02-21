@@ -13,7 +13,7 @@ pub enum ComputeMethod {
 
 impl SubdivisionCurve {
     pub fn compute(&self, method: ComputeMethod, steps: u16) -> Vec<Point> {
-        let mut worker = self.clone();
+        let worker = self.clone();
 
         match method {
             ComputeMethod::Chaikin => worker.compute_chaikin(steps),
