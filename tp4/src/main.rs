@@ -1,4 +1,4 @@
-use clap::Parser;
+use clap::{Parser, ValueEnum};
 use geonum_common::{BoundingBox as _, FromCSV};
 use plotters::{element::DashedPathElement, prelude::*};
 use subdivision::{ComputeMethod, SubdivisionCurve};
@@ -17,21 +17,48 @@ struct Args {
     output: String,
 
     /// Number of subdivision steps
-    #[arg(short, long, default_value_t = 4)]
+    #[arg(short, long, default_value_t = 8)]
     steps: u16,
 
     /// Wether to draw intermediate control polygons
     #[arg(short, long)]
     draw_control: bool,
+
+    /// Method for computing the subdivision curve
+    #[arg(short, long, default_value_t, value_enum)]
+    method: Method,
+
+    /// Alpha parameter for corner-cutting method
+    #[arg(short, long, default_value_t = 0.1)]
+    alpha: f32,
+
+    /// Beta parameter for corner-cutting method
+    #[arg(short, long, default_value_t = 0.6)]
+    beta: f32,
+}
+
+#[derive(ValueEnum, Default, Debug, Clone, serde::Serialize)]
+#[serde(rename_all = "kebab-case")]
+enum Method {
+    #[default]
+    Chaikin,
+    CornerCutting,
+    FourPoint,
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
 
+    let method = match args.method {
+        Method::Chaikin => ComputeMethod::Chaikin,
+        Method::CornerCutting => ComputeMethod::CornerCutting {
+            a: args.alpha,
+            b: args.beta,
+        },
+        Method::FourPoint => ComputeMethod::FourPoint,
+    };
     let subdivision = SubdivisionCurve::from_csv(&args.data_path);
-    let points = subdivision
-        .clone()
-        .compute(ComputeMethod::FourPoint, args.steps);
+    let points = subdivision.clone().compute(method, args.steps);
     let bb = points.bounding_box();
 
     let root = SVGBackend::new(&args.output, (1080, 720)).into_drawing_area();
