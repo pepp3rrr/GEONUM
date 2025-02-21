@@ -16,20 +16,11 @@ impl SubdivisionCurve {
         let mut worker = self.clone();
 
         match method {
-            ComputeMethod::Chaikin => {
-                worker
-                    .control
-                    .push(worker.control.first().cloned().unwrap());
-                worker.compute_chaikin(steps)
-            }
-            ComputeMethod::CornerCutting { a, b } => {
-                worker
-                    .control
-                    .push(worker.control.first().cloned().unwrap());
-                worker.compute_corner_cutting(steps, a, b)
-            }
+            ComputeMethod::Chaikin => worker.compute_chaikin(steps),
+            ComputeMethod::CornerCutting { a, b } => worker.compute_corner_cutting(steps, a, b),
             ComputeMethod::FourPoint => {
                 let mut out = worker.compute_four_point(steps);
+                // Closed polygon hack
                 out.push(out.first().cloned().unwrap());
                 out
             }
@@ -50,29 +41,16 @@ impl SubdivisionCurve {
         let n = self.control.len();
         let mut new = Vec::<Point>::with_capacity(2 * n);
 
-        new.push(
-            self.control
-                .first()
-                .cloned()
-                .expect("Control vec should not be empty"),
-        );
+        for i in 0..n {
+            let xi = self.control[i];
+            let xi_p1 = self.control[(i + 1) % n];
 
-        self.control.windows(2).for_each(|k| {
-            let [xi, xi_1]: [Point; 2] = k.try_into().expect("Should be size 2");
-
-            let x2i = ((1. - a) * xi + a * xi_1).into_point();
-            let x2i_1 = ((1. - b) * xi + b * xi_1).into_point();
+            let x2i = ((1. - a) * xi + a * xi_p1).into_point();
+            let x2i_1 = ((1. - b) * xi + b * xi_p1).into_point();
 
             new.push(x2i);
             new.push(x2i_1);
-        });
-
-        new.push(
-            self.control
-                .last()
-                .cloned()
-                .expect("Control vec should not be empty"),
-        );
+        }
 
         assert_eq!(new.len(), 2 * n);
 
