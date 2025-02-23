@@ -62,7 +62,9 @@ impl Plot for BezierSpline {
 
         curve.sample(scaled_t - curve_index)
     }
+}
 
+impl BoundingBox for BezierSpline {
     fn bounding_box(&self) -> (Point, Point) {
         let sub_bboxes = self
             .curves

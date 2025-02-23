@@ -1,5 +1,5 @@
 use clap::Parser;
-use geonum_common::{FromCSV as _, Plot as _};
+use geonum_common::{BoundingBox as _, FromCSV as _, Plot as _};
 use plotters::{element::DashedPathElement, prelude::*};
 
 mod spline;

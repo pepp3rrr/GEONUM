@@ -167,6 +167,20 @@ impl std::ops::Add for PointComb {
     }
 }
 
+impl std::ops::Sub for PointComb {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self {
+            point: Point {
+                x: self.point.x - rhs.point.x,
+                y: self.point.y - rhs.point.y,
+            },
+            factor: self.factor - rhs.factor,
+        }
+    }
+}
+
 impl std::ops::Add<Point> for PointComb {
     type Output = Self;
 
@@ -191,6 +205,34 @@ impl std::ops::Add<PointComb> for Point {
                 y: self.y + rhs.point.y,
             },
             factor: rhs.factor + 1.0,
+        }
+    }
+}
+
+impl std::ops::Mul<f32> for PointComb {
+    type Output = Self;
+
+    fn mul(self, rhs: f32) -> Self::Output {
+        PointComb {
+            point: Point {
+                x: self.point.x * rhs,
+                y: self.point.y * rhs,
+            },
+            factor: self.factor * rhs,
+        }
+    }
+}
+
+impl std::ops::Mul<PointComb> for f32 {
+    type Output = PointComb;
+
+    fn mul(self, rhs: PointComb) -> Self::Output {
+        PointComb {
+            point: Point {
+                x: self * rhs.point.x,
+                y: self * rhs.point.y,
+            },
+            factor: self * rhs.factor,
         }
     }
 }

@@ -1,0 +1,10 @@
+[package]
+name = "tp4-subdivision"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+geonum-common = { path = "../common" }
+clap = { workspace = true }
+plotters = { workspace = true }
+serde = { version = "1.0.218", features = ["derive"] }
