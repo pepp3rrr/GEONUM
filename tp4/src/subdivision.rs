@@ -90,23 +90,10 @@ impl SubdivisionCurve {
 }
 
 impl FromCSV for SubdivisionCurve {
-    fn read(mut reader: geonum_common::CSVReader) -> Self {
-        let control: Vec<_> = reader
-            .records()
-            .map(|result| {
-                let record = result.expect("Failed to read record");
-
-                let x_str = record.get(0).unwrap();
-                let y_str = record.get(1).unwrap();
-
-                let x = x_str.parse().unwrap();
-                let y = y_str.parse().unwrap();
-
-                Point::new(x, y)
-            })
-            .collect();
-
-        Self { control }
+    fn read(reader: geonum_common::CSVReader) -> Self {
+        Self {
+            control: Vec::<Point>::read(reader),
+        }
     }
 }
 

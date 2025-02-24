@@ -30,23 +30,8 @@ impl From<Vec<Point>> for BezierSpline {
 }
 
 impl FromCSV for BezierSpline {
-    fn read(mut reader: CSVReader) -> Self {
-        let control: Vec<Point> = reader
-            .records()
-            .map(|result| {
-                let record = result.expect("Failed to read record");
-
-                let x_str = record.get(0).unwrap();
-                let y_str = record.get(1).unwrap();
-
-                let x = x_str.parse().unwrap();
-                let y = y_str.parse().unwrap();
-
-                Point::new(x, y)
-            })
-            .collect();
-
-        Self::from(control)
+    fn read(reader: CSVReader) -> Self {
+        Self::from(Vec::<Point>::read(reader))
     }
 }
 
