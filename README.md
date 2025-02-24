@@ -14,6 +14,7 @@ Pour exécuter le code d'un TP, on a besoin de son nom de module :
 
  - [TP1](./tp1) : `tp1-bezier`
  - [TP2](./tp2) : `tp2-spline`
+ - [TP4](./tp4) : `tp4-subdivision`
 
 Que l'on utilise dans la commande
 
