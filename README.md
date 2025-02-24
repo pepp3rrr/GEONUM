@@ -4,7 +4,7 @@
 
 Le SDK Rust est nécéssaire à l'exéctution du projet. Pour son installation je recommande [Rustup](https://rustup.rs/).
 
-Si vous avez des erreurs durant la compilation, essayez d'installer les librairies `pkg-config`, `libfreetype6-dev` et `libfontconfig1-dev`.
+Si vous avez des erreurs durant la compilation, essayez d'installer les librairies `build-essentials`, `pkg-config`, `libfreetype6-dev` et `libfontconfig1-dev` (sur un système basé sur Debian).
 
 ## TPS
 
