@@ -1,7 +1,8 @@
 use geonum_common::{FromCSV, Point};
 
+#[derive(Clone)]
 pub struct UniformBezierSpline {
-    control: Vec<Point>,
+    pub control: Vec<Point>,
 }
 
 impl UniformBezierSpline {
