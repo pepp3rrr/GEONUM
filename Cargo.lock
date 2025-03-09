@@ -827,7 +827,10 @@ dependencies = [
 name = "tp5-uniform-spline"
 version = "0.1.0"
 dependencies = [
+ "clap",
  "geonum-common",
+ "plotters",
+ "serde",
 ]
 
 [[package]]
