@@ -59,25 +59,25 @@ impl BoundingBox for BezierSpline {
 
         let right = sub_bboxes
             .iter()
-            .map(|b| b.1.x)
+            .map(|b| b.1.x())
             .max_by(|a, b| a.total_cmp(&b))
             .unwrap();
         let top = sub_bboxes
             .iter()
-            .map(|b| b.1.y)
+            .map(|b| b.1.y())
             .max_by(|a, b| a.total_cmp(&b))
             .unwrap();
         let left = sub_bboxes
             .iter()
-            .map(|b| b.0.x)
+            .map(|b| b.0.x())
             .max_by(|a, b| b.total_cmp(&a))
             .unwrap();
         let bottom = sub_bboxes
             .iter()
-            .map(|b| b.0.y)
+            .map(|b| b.0.y())
             .max_by(|a, b| b.total_cmp(&a))
             .unwrap();
 
-        (Point::new(left, bottom), Point::new(right, top))
+        (Point::<2>::new(left, bottom), Point::<2>::new(right, top))
     }
 }

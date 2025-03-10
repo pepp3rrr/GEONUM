@@ -73,14 +73,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .margin(5)
         .x_label_area_size(30)
         .y_label_area_size(30)
-        .build_cartesian_2d(bb.0.x..bb.1.x, bb.0.y..bb.1.y)?;
+        .build_cartesian_2d(bb.0.x()..bb.1.x(), bb.0.y()..bb.1.y())?;
 
     chart.configure_mesh().draw()?;
 
     root.draw(&PathElement::new(
         points
             .iter()
-            .map(|p| chart.backend_coord(&(p.x, p.y)))
+            .map(|p| chart.backend_coord(&(p.x(), p.y())))
             .collect::<Vec<_>>(),
         &RED,
     ))?;
@@ -90,7 +90,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             subdivision
                 .control
                 .iter()
-                .map(|p| chart.backend_coord(&(p.x, p.y))),
+                .map(|p| chart.backend_coord(&(p.x(), p.y()))),
             4,
             2,
             &BLACK,
@@ -102,7 +102,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .enumerate()
             .for_each(|(index, point)| {
                 root.draw(&Circle::new(
-                    chart.backend_coord(&(point.x, point.y)),
+                    chart.backend_coord(&(point.x(), point.y())),
                     if index == 0 || index == (subdivision.control.len() - 1) {
                         5
                     } else {
