@@ -40,7 +40,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .margin(5)
         .x_label_area_size(30)
         .y_label_area_size(30)
-        .build_cartesian_2d(bb.0.x..bb.1.x, bb.0.y..bb.1.y)?;
+        .build_cartesian_2d(bb.0.x()..bb.1.x(), bb.0.y()..bb.1.y())?;
 
     chart.configure_mesh().draw()?;
 
@@ -57,7 +57,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         .map(|x| x as f32 / (args.samples as f32))
                         .map(|x| {
                             let result = bezier.sample(x);
-                            (result.x, result.y)
+                            (result.x(), result.y())
                         }),
                     &colors.get(index % colors.len()).unwrap(),
                 ))
@@ -70,7 +70,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 bezier
                     .control
                     .iter()
-                    .map(|p| chart.backend_coord(&(p.x, p.y))),
+                    .map(|p| chart.backend_coord(&(p.x(), p.y()))),
                 4,
                 2,
                 &full_palette::GREY_A700,
@@ -83,7 +83,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .enumerate()
                 .for_each(|(index, point)| {
                     root.draw(&Circle::new(
-                        chart.backend_coord(&(point.x, point.y)),
+                        chart.backend_coord(&(point.x(), point.y())),
                         if index == 0 || index == (bezier.control.len() - 1) {
                             5
                         } else {
