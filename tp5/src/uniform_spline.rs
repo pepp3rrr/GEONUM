@@ -136,12 +136,12 @@ impl UniformBezierSpline {
             let mut new_smoothed = Vec::<Point>::with_capacity(s);
 
             for i in 0..(2 * n) {
-                let v_im2 = new[(i + n - 2) % n];
-                let v_im1 = new[(i + n - 1) % n];
+                let v_im2 = new[(i + s - 2) % s];
+                let v_im1 = new[(i + s - 1) % s];
                 let v_i = new[i];
-                let v_ip1 = new[(i + 1) % n];
-                let v_ip2 = new[(i + 2) % n];
-                let v_ip3 = new[(i + 3) % n];
+                let v_ip1 = new[(i + 1) % s];
+                let v_ip2 = new[(i + 2) % s];
+                let v_ip3 = new[(i + 3) % s];
 
                 let v_d_i = (1. / 256.
                     * (3. * v_im2 - 25. * v_im1 + 150. * v_i + 150. * v_ip1 - 25. * v_ip2
