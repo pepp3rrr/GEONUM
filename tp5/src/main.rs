@@ -79,6 +79,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             spline
                 .control
                 .iter()
+                .chain([spline.control.first().unwrap()].into_iter())
                 .map(|p| chart.backend_coord(&(p.x(), p.y()))),
             4,
             2,
