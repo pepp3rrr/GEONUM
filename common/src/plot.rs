@@ -38,8 +38,8 @@ impl BoundingBox for Vec<Point<2>> {
 pub fn combine_bounding_boxes(a: (Point, Point), b: (Point, Point)) -> (Point, Point) {
     let right = a.1.x().max(b.1.x());
     let top = a.1.y().max(b.1.y());
-    let left = a.0.x().max(b.0.x());
-    let bottom = a.0.y().max(b.0.y());
+    let left = a.0.x().min(b.0.x());
+    let bottom = a.0.y().min(b.0.y());
 
     (Point::<2>::new(left, bottom), Point::<2>::new(right, top))
 }
