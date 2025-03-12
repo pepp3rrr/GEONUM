@@ -824,6 +824,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "tp5-uniform-spline"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "geonum-common",
+ "plotters",
+ "serde",
+]
+
+[[package]]
 name = "ttf-parser"
 version = "0.20.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
