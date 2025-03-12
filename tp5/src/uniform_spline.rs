@@ -5,8 +5,24 @@ pub struct UniformBezierSpline {
     pub control: Vec<Point>,
 }
 
+pub enum ComputeMethod {
+    TwoPoint,
+    FourPoint,
+    SixPoint,
+}
+
 impl UniformBezierSpline {
-    pub fn compute_two_point(self, steps: u16, degree: u16) -> Vec<Point> {
+    pub fn compute(&self, method: ComputeMethod, steps: u16, degree: u16) -> Vec<Point> {
+        let worker = self.clone();
+
+        match method {
+            ComputeMethod::TwoPoint => worker.compute_two_point(steps, degree),
+            ComputeMethod::FourPoint => worker.compute_four_point(steps, degree),
+            ComputeMethod::SixPoint => worker.compute_six_point(steps, degree),
+        }
+    }
+
+    fn compute_two_point(self, steps: u16, degree: u16) -> Vec<Point> {
         if steps == 0 {
             return self.control;
         }
@@ -37,7 +53,7 @@ impl UniformBezierSpline {
         UniformBezierSpline { control: new }.compute_two_point(steps - 1, degree)
     }
 
-    pub fn compute_four_point(self, steps: u16, degree: u16) -> Vec<Point> {
+    fn compute_four_point(self, steps: u16, degree: u16) -> Vec<Point> {
         if steps == 0 {
             return self.control;
         }
@@ -85,7 +101,7 @@ impl UniformBezierSpline {
         UniformBezierSpline { control: new }.compute_four_point(steps - 1, degree)
     }
 
-    pub fn compute_six_point(self, steps: u16, degree: u16) -> Vec<Point> {
+    fn compute_six_point(self, steps: u16, degree: u16) -> Vec<Point> {
         if steps == 0 {
             return self.control;
         }

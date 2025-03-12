@@ -1,10 +1,9 @@
-use clap::Parser;
+use clap::{Parser, ValueEnum};
 use geonum_common::{BoundingBox as _, FromCSV as _};
 use plotters::{element::DashedPathElement, prelude::*};
+use uniform_spline::{ComputeMethod, UniformBezierSpline};
 
 mod uniform_spline;
-
-use uniform_spline::UniformBezierSpline;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -21,6 +20,10 @@ struct Args {
     #[arg(short, long, default_value_t = 8)]
     steps: u16,
 
+    /// Method for computing the uniform spline
+    #[arg(short, long, default_value_t, value_enum)]
+    method: Method,
+
     /// Degree of the uniform spline
     #[arg(short, long, default_value_t = 3)]
     degree: u16,
@@ -30,18 +33,32 @@ struct Args {
     control: bool,
 }
 
+#[derive(ValueEnum, Default, Debug, Clone, serde::Serialize)]
+#[serde(rename_all = "kebab-case")]
+enum Method {
+    #[default]
+    TwoPoint,
+    FourPoint,
+    SixPoint,
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
 
+    let method = match args.method {
+        Method::TwoPoint => ComputeMethod::TwoPoint,
+        Method::FourPoint => ComputeMethod::FourPoint,
+        Method::SixPoint => ComputeMethod::SixPoint,
+    };
     let spline = UniformBezierSpline::from_csv(&args.data_path);
-    let points = spline.clone().compute_two_point(args.steps, args.degree);
+    let points = spline.compute(method, args.steps, args.degree);
     let bb = points.bounding_box();
 
     let root = SVGBackend::new(&args.output, (1080, 720)).into_drawing_area();
     root.fill(&WHITE)?;
 
     let mut chart = ChartBuilder::on(&root)
-        .caption("Sub-division curve", ("sans-serif", 50).into_font())
+        .caption("Uniform Bezier Spline", ("sans-serif", 50).into_font())
         .margin(5)
         .x_label_area_size(30)
         .y_label_area_size(30)
