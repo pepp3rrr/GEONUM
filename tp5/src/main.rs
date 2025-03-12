@@ -52,7 +52,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
     let spline = UniformBezierSpline::from_csv(&args.data_path);
     let points = spline.compute(method, args.steps, args.degree);
-    let bb = spline.control.bounding_box();
+    let bb =
+        geonum_common::combine_bounding_boxes(spline.control.bounding_box(), points.bounding_box());
 
     let root = SVGBackend::new(&args.output, (1080, 720)).into_drawing_area();
     root.fill(&WHITE)?;
