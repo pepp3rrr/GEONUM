@@ -68,17 +68,30 @@ cargo run -p tp5-uniform-spline -- -m two-point -d 5 -o /tmp/plot.svg tp5/data/s
 
 #### Rendus de degré 3
 
-![bone.data](https://github.com/user-attachments/assets/f7082ae7-25d0-4f3e-a177-84c7059fb41a)
+![bone.data](https://github.com/user-attachments/assets/908bc8c5-60cc-44da-88a2-bd64baa9d879)
 
-![hepta.data](https://github.com/user-attachments/assets/810d47b6-1e10-40c0-a500-2feeb77e5b5f)
+![hepta.data](https://github.com/user-attachments/assets/4eb73ee3-c83a-4639-8a01-3754a3f67403)
 
-![infinity.data](https://github.com/user-attachments/assets/a9f07110-9c84-43ce-b200-59670b61b1e1)
+![infinity.data](https://github.com/user-attachments/assets/07d29c9c-7db3-46a0-937a-76ed35ee54f1)
 
-![sumsign.data](https://github.com/user-attachments/assets/4d3e79aa-1468-47e5-8ba9-f29d6454cd65)
+![sumsign.data](https://github.com/user-attachments/assets/b0796f13-423a-4542-8672-4cae3e85cd78)
 
-Ici nous pensons que l'on a un bug, car nous n'avons pas les mêmes résultats que dans [le papier](https://onlinelibrary.wiley.com/doi/10.1155/2014/628285)
+#### Rendus de degré 2
+
+![sumsign.data](https://github.com/user-attachments/assets/57667087-f3a0-4329-bc7c-7de89c7c0c4e)
+
+#### Rendus de degré 1
+
+![sumsign.data](https://github.com/user-attachments/assets/8892af6e-7056-416a-b126-1d9ed0acb91e)
+
+#### Rendus de degré 0
+
+![sumsign.data](https://github.com/user-attachments/assets/4ce80884-ff20-4c9e-b31b-e5d0bd617f71)
+
+#### Rendus de degré 5
+
+![sumsign.data](https://github.com/user-attachments/assets/7f24bdb8-8f56-4f3c-bdde-328796f3ada2)
 
 ## Conclusion
 
-La méthode qui (selon nous) donne le meilleur résultat est la méthode des quatre points avec un degré de trois, qui permet de conserver une forme nette et pas trop ronde tout en ayant de beaux arrondis. Nous pensons que c'est parce que l'utilisation de quatre points permet d'incorporer plus de détails dans les courbes. 
-Si la méthode à six points n'était pas buguée, elle aurait pu être la méthode préférée.
+La méthode qui (selon nous) donne le meilleur résultat est la méthode two-point avec un degré de deux, qui ajoute des arrondis simples et élégants, contrairement aux méthodes four-point et six-point qui ajoutent trop de complexité/détail, du fait qu'ils font la moyenne entre plus de points.
