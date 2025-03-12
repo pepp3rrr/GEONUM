@@ -84,6 +84,62 @@ impl UniformBezierSpline {
 
         UniformBezierSpline { control: new }.compute_four_point(steps - 1, degree)
     }
+
+    pub fn compute_six_point(self, steps: u16, degree: u16) -> Vec<Point> {
+        if steps == 0 {
+            return self.control;
+        }
+
+        let n = self.control.len();
+        let s = 2 * n;
+        let mut new = Vec::<Point>::with_capacity(s);
+
+        // Refine
+        for i in 0..n {
+            let p_im2 = self.control[(i + n - 2) % n];
+            let p_im1 = self.control[(i + n - 1) % n];
+            let p_i = self.control[i];
+            let p_ip1 = self.control[(i + 1) % n];
+            let p_ip2 = self.control[(i + 2) % n];
+            let p_ip3 = self.control[(i + 3) % n];
+
+            let v_2i_p1 = (1. / 256.
+                * (3. * p_im2 - 25. * p_im1 + 150. * p_i + 150. * p_ip1 - 25. * p_ip2
+                    + 3. * p_ip3))
+                .into_point();
+            let v_2i = p_i;
+
+            new.push(v_2i);
+            new.push(v_2i_p1);
+        }
+
+        assert_eq!(new.len(), s);
+
+        // Smooth
+        for _d in 0..degree {
+            let mut new_smoothed = Vec::<Point>::with_capacity(s);
+
+            for i in 0..(2 * n) {
+                let v_im2 = new[(i + n - 2) % n];
+                let v_im1 = new[(i + n - 1) % n];
+                let v_i = new[i];
+                let v_ip1 = new[(i + 1) % n];
+                let v_ip2 = new[(i + 2) % n];
+                let v_ip3 = new[(i + 3) % n];
+
+                let v_d_i = (1. / 256.
+                    * (3. * v_im2 - 25. * v_im1 + 150. * v_i + 150. * v_ip1 - 25. * v_ip2
+                        + 3. * v_ip3))
+                    .into_point();
+
+                new_smoothed.push(v_d_i);
+            }
+
+            new = new_smoothed;
+        }
+
+        UniformBezierSpline { control: new }.compute_six_point(steps - 1, degree)
+    }
 }
 
 impl FromCSV for UniformBezierSpline {
