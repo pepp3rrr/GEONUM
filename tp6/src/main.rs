@@ -1,8 +1,7 @@
 use bezier_surface::BezierSurface;
 use blue_engine::{
     header::{Engine, WindowDescriptor},
-    primitive_shapes::triangle,
-    KeyCode, ObjectSettings, Vector3,
+    KeyCode, ObjectSettings, Vector2, Vector3, Vertex,
 };
 use geonum_common::FromCSV as _;
 
@@ -11,17 +10,63 @@ mod bezier_surface;
 const MOVE_SPEED: f32 = 10f32;
 
 fn main() {
-    let surface = BezierSurface::from_csv("tp6/data/teapot.bpt");
-    println!("{:?}", surface.control);
+    let surface = BezierSurface::from_csv("tp6/data/heart.bpt");
 
     let mut engine =
         Engine::new_config(WindowDescriptor::default()).expect("Couldn't init the Engine");
 
-    triangle(
-        "Triangle",
+    let mut vertices = Vec::new();
+    let mut indices = Vec::new();
+
+    let mut i = 0;
+    for grid in surface.control {
+        for x in 0..grid.len() {
+            let row = grid[x].clone();
+            for y in 0..row.len() {
+                let b_x_y = row[y];
+                if x + 1 < grid.len() && y + 1 < row.len() {
+                    let b_xp1_y = grid[x + 1][y];
+                    let b_x_yp1 = row[y + 1];
+                    let b_xp1_yp1 = grid[x + 1][y + 1];
+
+                    vertices.push(Vertex {
+                        position: Vector3::new(b_x_y.x(), b_x_y.y(), b_x_y.z()),
+                        uv: Vector2::ZERO,
+                        normal: Vector3::ZERO,
+                    });
+                    vertices.push(Vertex {
+                        position: Vector3::new(b_x_yp1.x(), b_x_yp1.y(), b_x_yp1.z()),
+                        uv: Vector2::ZERO,
+                        normal: Vector3::ZERO,
+                    });
+                    vertices.push(Vertex {
+                        position: Vector3::new(b_xp1_y.x(), b_xp1_y.y(), b_xp1_y.z()),
+                        uv: Vector2::ZERO,
+                        normal: Vector3::ZERO,
+                    });
+                    vertices.push(Vertex {
+                        position: Vector3::new(b_xp1_yp1.x(), b_xp1_yp1.y(), b_xp1_yp1.z()),
+                        uv: Vector2::ZERO,
+                        normal: Vector3::ZERO,
+                    });
+                    indices.push(i);
+                    indices.push(i + 1);
+                    indices.push(i + 2);
+                    indices.push(i + 2);
+                    indices.push(i + 1);
+                    indices.push(i + 3);
+                    i += 4;
+                }
+            }
+        }
+    }
+
+    engine.objects.new_object(
+        "Figure",
+        vertices,
+        indices,
         ObjectSettings::default(),
         &mut engine.renderer,
-        &mut engine.objects,
     );
 
     let mut time = std::time::Instant::now();
