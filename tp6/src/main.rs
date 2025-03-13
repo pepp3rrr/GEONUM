@@ -1,12 +1,19 @@
+use bezier_surface::BezierSurface;
 use blue_engine::{
     header::{Engine, WindowDescriptor},
     primitive_shapes::triangle,
     KeyCode, ObjectSettings, Vector3,
 };
+use geonum_common::FromCSV as _;
+
+mod bezier_surface;
 
 const MOVE_SPEED: f32 = 10f32;
 
 fn main() {
+    let surface = BezierSurface::from_csv("tp6/data/teapot.bpt");
+    println!("{:?}", surface.control);
+
     let mut engine =
         Engine::new_config(WindowDescriptor::default()).expect("Couldn't init the Engine");
 
