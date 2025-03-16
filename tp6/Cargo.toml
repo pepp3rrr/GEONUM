@@ -1,0 +1,10 @@
+[package]
+name = "tp6-bezier-surface"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+clap = { workspace = true, features = ["derive"] }
+geonum-common = { path = "../common" }
+tp1-bezier = { path = "../tp1" }
+blue_engine = "0.6.2"

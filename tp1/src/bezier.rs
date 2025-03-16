@@ -1,31 +1,32 @@
 use geonum_common::*;
 
-pub struct Bezier {
-    pub control: Vec<Point>,
+pub struct Bezier<const D: usize = 2> {
+    pub control: Vec<Point<D>>,
 }
 
-impl Bezier {
-    pub fn new(control: Vec<Point>) -> Self {
+impl<const D: usize> Bezier<D> {
+    pub fn new(control: Vec<Point<D>>) -> Self {
         Self { control }
     }
 
-    fn compute(t: f32, mut control: Vec<Point>) -> Point {
-        let n = control.len();
+    // Recursive De Casteljau method
+    pub fn compute(mut self, t: f32) -> Point<D> {
+        let n = self.control.len();
 
         if n == 1 {
-            return control.pop().expect("Should not be empty");
+            return self.control.pop().expect("Should not be empty");
         }
 
-        let mut new = Vec::<Point>::new();
+        let mut new = Vec::<Point<D>>::new();
         for k in 1..n {
-            let a = control.get(k - 1).unwrap().clone();
-            let b = control.get(k).unwrap().clone();
+            let a = self.control.get(k - 1).unwrap().clone();
+            let b = self.control.get(k).unwrap().clone();
 
             let coord = ((1.0 - t) * a + t * b).into_point();
             new.push(coord);
         }
 
-        Self::compute(t, new)
+        Bezier::new(new).compute(t)
     }
 }
 
@@ -39,7 +40,7 @@ impl FromCSV for Bezier {
 
 impl Plot for Bezier {
     fn sample(&self, t: f32) -> Point {
-        Self::compute(t, self.control.clone())
+        Bezier::new(self.control.clone()).compute(t)
     }
 }
 
