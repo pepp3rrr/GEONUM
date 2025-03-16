@@ -3,13 +3,13 @@ use blue_engine::{
     header::{Engine, WindowDescriptor},
     wgpu, ObjectSettings, ShaderSettings,
 };
+use clap::Parser;
 use geonum_common::FromCSV as _;
 use render::IntoMesh;
 
 mod bezier_surface;
 mod render;
 
-const SAMPLES_PER_AXIS: u32 = 12;
 const COLORS: [(f32, f32, f32, f32); 6] = [
     (1.0, 0.0, 0.0, 1.0),
     (0.0, 1.0, 0.0, 1.0),
@@ -19,20 +19,34 @@ const COLORS: [(f32, f32, f32, f32); 6] = [
     (0.0, 1.0, 1.0, 1.0),
 ];
 
+#[derive(Parser, Debug)]
+#[command(version, about, long_about = None)]
+struct Args {
+    /// The path of the BCV file to plot
+    #[arg()]
+    bpt_path: String,
+
+    /// Number of datapoints to sample (per axis)
+    #[arg(short, long, default_value_t = 8)]
+    samples: u16,
+}
+
 fn main() {
+    let args = Args::parse();
+
     let mut engine =
         Engine::new_config(WindowDescriptor::default()).expect("Couldn't init the Engine");
 
-    let surface = PiecewiseBezierSurface::from_csv("tp6/data/teapot.bpt");
+    let surface = PiecewiseBezierSurface::from_csv(args.bpt_path);
 
     for (n, patch) in surface.patches.into_iter().enumerate() {
         let mut samples = Vec::new();
-        for i in 0..(SAMPLES_PER_AXIS + 1) {
+        for i in 0..(args.samples + 1) {
             let mut row = Vec::new();
-            for j in 0..(SAMPLES_PER_AXIS + 1) {
+            for j in 0..(args.samples + 1) {
                 let (u, v) = (
-                    i as f32 / SAMPLES_PER_AXIS as f32,
-                    j as f32 / SAMPLES_PER_AXIS as f32,
+                    i as f32 / args.samples as f32,
+                    j as f32 / args.samples as f32,
                 );
                 let sample = patch.evalutate(u, v);
                 row.push(sample);
