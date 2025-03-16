@@ -2743,6 +2743,7 @@ version = "0.1.0"
 dependencies = [
  "blue_engine",
  "geonum-common",
+ "tp1-bezier",
 ]
 
 [[package]]
