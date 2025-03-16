@@ -8,6 +8,25 @@ pub struct PiecewiseBezierSurface {
     pub patches: Vec<BezierSurface>,
 }
 
+impl BezierSurface {
+    pub fn evalutate(&self, u: f32, v: f32) -> Point<3> {
+        // Curves along the X (i on the figure) axis
+        let curves_x = self.control.iter().map(|points| {
+            // Y coord is constant
+            tp1_bezier::Bezier::new(points.clone())
+        });
+
+        // Computed new control points along the Y axis (j)
+        let control_y = curves_x
+            .map(|bezier_curve| bezier_curve.compute(u))
+            .collect::<Vec<_>>();
+
+        let curve_y = tp1_bezier::Bezier::new(control_y);
+
+        curve_y.compute(v)
+    }
+}
+
 impl FromCSV for PiecewiseBezierSurface {
     fn read(mut reader: geonum_common::CSVReader) -> Self {
         let mut patches = Vec::new();
