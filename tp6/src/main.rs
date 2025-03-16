@@ -1,4 +1,4 @@
-use bezier_surface::BezierSurface;
+use bezier_surface::PiecewiseBezierSurface;
 use blue_engine::{
     header::{Engine, WindowDescriptor},
     wgpu, KeyCode, ObjectSettings, RotateAmount, RotateAxis, ShaderSettings, Vector2, Vector3,
@@ -11,7 +11,7 @@ mod bezier_surface;
 const MOVE_SPEED: f32 = 10f32;
 
 fn main() {
-    let surface = BezierSurface::from_csv("tp6/data/teapot.bpt");
+    let surface = PiecewiseBezierSurface::from_csv("tp6/data/teapot.bpt");
 
     let mut engine =
         Engine::new_config(WindowDescriptor::default()).expect("Couldn't init the Engine");
@@ -20,7 +20,9 @@ fn main() {
     let mut indices = Vec::new();
 
     let mut i = 0;
-    for grid in surface.control {
+    for patch in surface.patches {
+        let grid = patch.control;
+
         for x in 0..grid.len() {
             let row = grid[x].clone();
             for y in 0..row.len() {

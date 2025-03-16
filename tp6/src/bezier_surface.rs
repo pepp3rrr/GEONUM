@@ -1,12 +1,16 @@
 use geonum_common::{FromCSV, Point};
 
 pub struct BezierSurface {
-    pub control: Vec<Vec<Vec<Point<3>>>>,
+    pub control: Vec<Vec<Point<3>>>,
 }
 
-impl FromCSV for BezierSurface {
+pub struct PiecewiseBezierSurface {
+    pub patches: Vec<BezierSurface>,
+}
+
+impl FromCSV for PiecewiseBezierSurface {
     fn read(mut reader: geonum_common::CSVReader) -> Self {
-        let mut control = Vec::new();
+        let mut patches = Vec::new();
 
         let mut iter = reader.records();
         while let Some(degree_line) = iter.next() {
@@ -15,7 +19,7 @@ impl FromCSV for BezierSurface {
             let degree_x: i32 = degree_line.get(0).unwrap().parse().unwrap();
             let degree_y: i32 = degree_line.get(1).unwrap().parse().unwrap();
 
-            let mut plane: Vec<Vec<Point<3>>> = Vec::new();
+            let mut control_net: Vec<Vec<Point<3>>> = Vec::new();
 
             for _x in 0..(degree_x + 1) {
                 let mut line: Vec<Point<3>> = Vec::new();
@@ -28,11 +32,13 @@ impl FromCSV for BezierSurface {
                     line.push(Point::<3>::new(x, y, z));
                 }
 
-                plane.push(line);
+                control_net.push(line);
             }
 
-            control.push(plane);
+            patches.push(BezierSurface {
+                control: control_net,
+            });
         }
-        Self { control }
+        Self { patches }
     }
 }
