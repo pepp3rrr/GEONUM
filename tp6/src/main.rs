@@ -1,7 +1,7 @@
 use bezier_surface::PiecewiseBezierSurface;
 use blue_engine::{
     header::{Engine, WindowDescriptor},
-    wgpu, ObjectSettings, ShaderSettings,
+    wgpu, KeyCode, ObjectSettings, ShaderSettings,
 };
 use clap::Parser;
 use geonum_common::FromCSV as _;
@@ -10,6 +10,7 @@ use render::IntoMesh;
 mod bezier_surface;
 mod render;
 
+const MOVE_SPEED: f32 = 10.0;
 const COLORS: [(f32, f32, f32, f32); 6] = [
     (1.0, 0.0, 0.0, 1.0),
     (0.0, 1.0, 0.0, 1.0),
@@ -62,7 +63,7 @@ fn main() {
             indices,
             ObjectSettings {
                 shader_settings: ShaderSettings {
-                    polygon_mode: wgpu::PolygonMode::Line,
+                    // polygon_mode: wgpu::PolygonMode::Line,
                     cull_mode: None,
                     ..Default::default()
                 },
@@ -79,12 +80,24 @@ fn main() {
             .set_color(c.0, c.1, c.2, c.3);
     }
 
-    let radius = 10.0;
+    let mut radius = 10.0;
+
     let start = std::time::SystemTime::now();
+    let mut t0 = start.elapsed().unwrap();
 
     engine
         .update_loop(
-            move |_renderer, _window, _objects, _events, camera, _plugins| {
+            move |_renderer, _window, _objects, events, camera, _plugins| {
+                let delta = (start.elapsed().unwrap() - t0).as_secs_f32();
+                t0 = start.elapsed().unwrap();
+
+                if events.key_held(KeyCode::KeyW) {
+                    radius -= MOVE_SPEED * delta;
+                }
+                if events.key_held(KeyCode::KeyS) {
+                    radius += MOVE_SPEED * delta;
+                }
+
                 let camx = start.elapsed().unwrap().as_secs_f32().sin() * radius;
                 let camy = start.elapsed().unwrap().as_secs_f32().sin() * radius;
                 let camz = start.elapsed().unwrap().as_secs_f32().cos() * radius;
