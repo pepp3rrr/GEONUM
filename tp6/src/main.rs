@@ -30,6 +30,10 @@ struct Args {
     /// Number of datapoints to sample (per axis)
     #[arg(short, long, default_value_t = 8)]
     samples: u16,
+
+    /// Draw in wireframe mode
+    #[arg(short, long)]
+    wireframe: bool,
 }
 
 fn main() {
@@ -63,7 +67,11 @@ fn main() {
             indices,
             ObjectSettings {
                 shader_settings: ShaderSettings {
-                    // polygon_mode: wgpu::PolygonMode::Line,
+                    polygon_mode: if args.wireframe {
+                        wgpu::PolygonMode::Line
+                    } else {
+                        Default::default()
+                    },
                     cull_mode: None,
                     ..Default::default()
                 },
