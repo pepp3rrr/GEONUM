@@ -19,7 +19,7 @@ fn main() {
     let surface = PiecewiseBezierSurface::from_csv("tp6/data/teapot.bpt");
 
     let mut figure_patch_meshes = Vec::new();
-    for (n, patch) in surface.patches.into_iter().enumerate() {
+    for patch in surface.patches {
         let mut samples = Vec::new();
         for i in 0..(SAMPLES_PER_AXIS + 1) {
             let mut row = Vec::new();
@@ -34,33 +34,37 @@ fn main() {
             samples.push(row);
         }
 
-        let (vertices, indices) = samples.into_mesh();
-        let id = format!("figure-{}", n);
+        figure_patch_meshes.push(samples.into_mesh());
+    }
 
-        engine.objects.new_object(
-            id.clone(),
-            vertices,
-            indices,
-            ObjectSettings {
-                shader_settings: ShaderSettings {
-                    polygon_mode: wgpu::PolygonMode::Line,
-                    cull_mode: None,
-                    ..Default::default()
-                },
+    let (vertices, indices) = figure_patch_meshes.into_mesh();
+    engine.objects.new_object(
+        "figure",
+        vertices,
+        indices,
+        ObjectSettings {
+            shader_settings: ShaderSettings {
+                polygon_mode: wgpu::PolygonMode::Line,
+                cull_mode: None,
                 ..Default::default()
             },
-            &mut engine.renderer,
-        );
-
-        figure_patch_meshes.push(id);
-    }
+            ..Default::default()
+        },
+        &mut engine.renderer,
+    );
 
     let mut time = std::time::Instant::now();
 
     engine
         .update_loop(
-            move |_renderer, _window, _objects, events, camera, _plugins| {
+            move |_renderer, _window, objects, events, camera, _plugins| {
                 let delta = time.elapsed().as_secs_f32();
+
+                let figure = objects.get_mut("figure").unwrap();
+
+                figure.rotate(RotateAmount::Radians(delta / 3.0), RotateAxis::X);
+                figure.rotate(RotateAmount::Radians(delta), RotateAxis::Y);
+                figure.rotate(RotateAmount::Radians(delta / 2.0), RotateAxis::Z);
 
                 let main_camera = camera.cameras.get("main").expect("No main camera");
                 let camera_position = main_camera.position.clone();
