@@ -1,12 +1,14 @@
 use blue_engine::{UnsignedIntType, Vector2, Vector3, Vertex};
 use geonum_common::Point;
 
+type Mesh = (Vec<Vertex>, Vec<UnsignedIntType>);
+
 pub trait IntoMesh {
-    fn into_mesh(&self) -> (Vec<Vertex>, Vec<UnsignedIntType>);
+    fn into_mesh(self) -> Mesh;
 }
 
 impl IntoMesh for Vec<Vec<Point<3>>> {
-    fn into_mesh(&self) -> (Vec<Vertex>, Vec<UnsignedIntType>) {
+    fn into_mesh(self) -> Mesh {
         let mut i = 0;
         let mut vertices = Vec::new();
         let mut indices = Vec::new();
@@ -47,6 +49,21 @@ impl IntoMesh for Vec<Vec<Point<3>>> {
                     i += 4;
                 }
             }
+        }
+
+        (vertices, indices)
+    }
+}
+
+impl IntoMesh for Vec<Mesh> {
+    fn into_mesh(self) -> Mesh {
+        let mut vertices = Vec::new();
+        let mut indices = Vec::new();
+
+        for mut mesh in self.into_iter() {
+            let offset = vertices.len() as u16;
+            vertices.append(&mut mesh.0);
+            indices.append(&mut mesh.1.into_iter().map(|i| i + offset).collect());
         }
 
         (vertices, indices)
