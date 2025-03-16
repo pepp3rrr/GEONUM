@@ -9,6 +9,7 @@ use geonum_common::FromCSV as _;
 mod bezier_surface;
 
 const MOVE_SPEED: f32 = 10f32;
+const SAMPLES_PER_AXIS: u32 = 12;
 
 fn main() {
     let surface = PiecewiseBezierSurface::from_csv("tp6/data/teapot.bpt");
@@ -21,7 +22,20 @@ fn main() {
 
     let mut i = 0;
     for patch in surface.patches {
-        let grid = patch.control;
+        let mut grid = Vec::new();
+        for i in 0..(SAMPLES_PER_AXIS + 1) {
+            let mut row = Vec::new();
+            for j in 0..(SAMPLES_PER_AXIS + 1) {
+                let (u, v) = (
+                    i as f32 / SAMPLES_PER_AXIS as f32,
+                    j as f32 / SAMPLES_PER_AXIS as f32,
+                );
+                let sample = patch.evalutate(u, v);
+                row.push(sample);
+            }
+            grid.push(row);
+        }
+        // grid = patch.control;
 
         for x in 0..grid.len() {
             let row = grid[x].clone();
@@ -33,22 +47,22 @@ fn main() {
                     let b_xp1_yp1 = grid[x + 1][y + 1];
 
                     vertices.push(Vertex {
-                        position: Vector3::new(b_x_y.x(), b_x_y.y(), b_x_y.z()),
+                        position: Vector3::new(b_x_y.x(), b_x_y.z(), b_x_y.y()),
                         uv: Vector2::ZERO,
                         normal: Vector3::ZERO,
                     });
                     vertices.push(Vertex {
-                        position: Vector3::new(b_x_yp1.x(), b_x_yp1.y(), b_x_yp1.z()),
+                        position: Vector3::new(b_x_yp1.x(), b_x_yp1.z(), b_x_yp1.y()),
                         uv: Vector2::ZERO,
                         normal: Vector3::ZERO,
                     });
                     vertices.push(Vertex {
-                        position: Vector3::new(b_xp1_y.x(), b_xp1_y.y(), b_xp1_y.z()),
+                        position: Vector3::new(b_xp1_y.x(), b_xp1_y.z(), b_xp1_y.y()),
                         uv: Vector2::ZERO,
                         normal: Vector3::ZERO,
                     });
                     vertices.push(Vertex {
-                        position: Vector3::new(b_xp1_yp1.x(), b_xp1_yp1.y(), b_xp1_yp1.z()),
+                        position: Vector3::new(b_xp1_yp1.x(), b_xp1_yp1.z(), b_xp1_yp1.y()),
                         uv: Vector2::ZERO,
                         normal: Vector3::ZERO,
                     });
@@ -88,9 +102,9 @@ fn main() {
 
                 let figure = objects.get_mut("Figure").unwrap();
 
-                figure.rotate(RotateAmount::Radians(delta / 3.0), RotateAxis::X);
+                // figure.rotate(RotateAmount::Radians(delta / 3.0), RotateAxis::X);
                 figure.rotate(RotateAmount::Radians(delta), RotateAxis::Y);
-                figure.rotate(RotateAmount::Radians(delta / 2.0), RotateAxis::Z);
+                // figure.rotate(RotateAmount::Radians(delta / 2.0), RotateAxis::Z);
 
                 let main_camera = camera.cameras.get("main").expect("No main camera");
                 let camera_position = main_camera.position.clone();
