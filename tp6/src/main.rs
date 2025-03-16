@@ -1,7 +1,7 @@
 use bezier_surface::PiecewiseBezierSurface;
 use blue_engine::{
     header::{Engine, WindowDescriptor},
-    wgpu, KeyCode, ObjectSettings, RotateAmount, RotateAxis, ShaderSettings, Vector3,
+    wgpu, ObjectSettings, ShaderSettings,
 };
 use geonum_common::FromCSV as _;
 use render::IntoMesh;
@@ -9,8 +9,15 @@ use render::IntoMesh;
 mod bezier_surface;
 mod render;
 
-const MOVE_SPEED: f32 = 10f32;
 const SAMPLES_PER_AXIS: u32 = 12;
+const COLORS: [(f32, f32, f32, f32); 6] = [
+    (1.0, 0.0, 0.0, 1.0),
+    (0.0, 1.0, 0.0, 1.0),
+    (1.0, 1.0, 0.0, 1.0),
+    (0.0, 0.0, 1.0, 1.0),
+    (1.0, 0.0, 1.0, 1.0),
+    (0.0, 1.0, 1.0, 1.0),
+];
 
 fn main() {
     let mut engine =
@@ -18,8 +25,7 @@ fn main() {
 
     let surface = PiecewiseBezierSurface::from_csv("tp6/data/teapot.bpt");
 
-    let mut figure_patch_meshes = Vec::new();
-    for patch in surface.patches {
+    for (n, patch) in surface.patches.into_iter().enumerate() {
         let mut samples = Vec::new();
         for i in 0..(SAMPLES_PER_AXIS + 1) {
             let mut row = Vec::new();
@@ -34,69 +40,42 @@ fn main() {
             samples.push(row);
         }
 
-        figure_patch_meshes.push(samples.into_mesh());
-    }
-
-    let (vertices, indices) = figure_patch_meshes.into_mesh();
-    engine.objects.new_object(
-        "figure",
-        vertices,
-        indices,
-        ObjectSettings {
-            shader_settings: ShaderSettings {
-                polygon_mode: wgpu::PolygonMode::Line,
-                cull_mode: None,
+        let id = format!("figure-{}", n);
+        let (vertices, indices) = samples.into_mesh();
+        engine.objects.new_object(
+            id.clone(),
+            vertices,
+            indices,
+            ObjectSettings {
+                shader_settings: ShaderSettings {
+                    polygon_mode: wgpu::PolygonMode::Line,
+                    cull_mode: None,
+                    ..Default::default()
+                },
                 ..Default::default()
             },
-            ..Default::default()
-        },
-        &mut engine.renderer,
-    );
+            &mut engine.renderer,
+        );
 
-    let mut time = std::time::Instant::now();
+        let c = COLORS[n % COLORS.len()];
+        engine
+            .objects
+            .get_mut(&id)
+            .unwrap()
+            .set_color(c.0, c.1, c.2, c.3);
+    }
+
+    let radius = 10.0;
+    let start = std::time::SystemTime::now();
 
     engine
         .update_loop(
-            move |_renderer, _window, objects, events, camera, _plugins| {
-                let delta = time.elapsed().as_secs_f32();
+            move |_renderer, _window, _objects, _events, camera, _plugins| {
+                let camx = start.elapsed().unwrap().as_secs_f32().sin() * radius;
+                let camy = start.elapsed().unwrap().as_secs_f32().sin() * radius;
+                let camz = start.elapsed().unwrap().as_secs_f32().cos() * radius;
 
-                let figure = objects.get_mut("figure").unwrap();
-
-                figure.rotate(RotateAmount::Radians(delta / 3.0), RotateAxis::X);
-                figure.rotate(RotateAmount::Radians(delta), RotateAxis::Y);
-                figure.rotate(RotateAmount::Radians(delta / 2.0), RotateAxis::Z);
-
-                let main_camera = camera.cameras.get("main").expect("No main camera");
-                let camera_position = main_camera.position.clone();
-
-                let direction_vector = Vector3 {
-                    x: if events.key_held(KeyCode::KeyA) {
-                        -1.0
-                    } else if events.key_held(KeyCode::KeyD) {
-                        1.0
-                    } else {
-                        0.0
-                    },
-                    y: if events.key_held(KeyCode::ShiftLeft) {
-                        -1.0
-                    } else if events.key_held(KeyCode::Space) {
-                        1.0
-                    } else {
-                        0.0
-                    },
-                    z: if events.key_held(KeyCode::KeyW) {
-                        -1.0
-                    } else if events.key_held(KeyCode::KeyS) {
-                        1.0
-                    } else {
-                        0.0
-                    },
-                };
-
-                camera.set_position(camera_position + direction_vector * MOVE_SPEED * delta);
-                camera.set_target(camera_position - Vector3::UNIT_Z);
-
-                time = std::time::Instant::now();
+                camera.set_position([camx, camy, camz]);
             },
         )
         .expect("Error during update loop");
