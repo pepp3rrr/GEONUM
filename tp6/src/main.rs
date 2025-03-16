@@ -1,7 +1,8 @@
 use bezier_surface::BezierSurface;
 use blue_engine::{
     header::{Engine, WindowDescriptor},
-    KeyCode, ObjectSettings, Vector2, Vector3, Vertex,
+    wgpu, KeyCode, ObjectSettings, RotateAmount, RotateAxis, ShaderSettings, Vector2, Vector3,
+    Vertex,
 };
 use geonum_common::FromCSV as _;
 
@@ -10,7 +11,7 @@ mod bezier_surface;
 const MOVE_SPEED: f32 = 10f32;
 
 fn main() {
-    let surface = BezierSurface::from_csv("tp6/data/heart.bpt");
+    let surface = BezierSurface::from_csv("tp6/data/teapot.bpt");
 
     let mut engine =
         Engine::new_config(WindowDescriptor::default()).expect("Couldn't init the Engine");
@@ -65,7 +66,14 @@ fn main() {
         "Figure",
         vertices,
         indices,
-        ObjectSettings::default(),
+        ObjectSettings {
+            shader_settings: ShaderSettings {
+                polygon_mode: wgpu::PolygonMode::Line,
+                cull_mode: None,
+                ..Default::default()
+            },
+            ..Default::default()
+        },
         &mut engine.renderer,
     );
 
@@ -73,10 +81,17 @@ fn main() {
 
     engine
         .update_loop(
-            move |_renderer, _window, _objects, events, camera, _plugins| {
+            move |_renderer, _window, objects, events, camera, _plugins| {
+                let delta = time.elapsed().as_secs_f32();
+
+                let figure = objects.get_mut("Figure").unwrap();
+
+                figure.rotate(RotateAmount::Radians(delta / 3.0), RotateAxis::X);
+                figure.rotate(RotateAmount::Radians(delta), RotateAxis::Y);
+                figure.rotate(RotateAmount::Radians(delta / 2.0), RotateAxis::Z);
+
                 let main_camera = camera.cameras.get("main").expect("No main camera");
                 let camera_position = main_camera.position.clone();
-                let delta = time.elapsed().as_secs_f32();
 
                 let direction_vector = Vector3 {
                     x: if events.key_held(KeyCode::KeyA) {
