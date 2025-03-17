@@ -1,3 +1,10 @@
+use bspline::BSpline;
+use geonum_common::FromCSV;
+
+mod bspline;
+
 fn main() {
-    println!("Hello, world!");
+    let spline = BSpline::from_csv("tp3/data/simple.bspline");
+
+    println!("{:?}", spline);
 }
