@@ -5,6 +5,6 @@ edition = "2021"
 
 [dependencies]
 clap = { workspace = true, features = ["derive"] }
-geonum-common = { path = "../common" }
+blue_engine = { workspace = true }
+geonum-common = { path = "../common", features = ["3d"] }
 tp1-bezier = { path = "../tp1" }
-blue_engine = "0.6.2"

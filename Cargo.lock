@@ -896,6 +896,7 @@ dependencies = [
 name = "geonum-common"
 version = "0.1.0"
 dependencies = [
+ "blue_engine",
  "csv",
 ]
 

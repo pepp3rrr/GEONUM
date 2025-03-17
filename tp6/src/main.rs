@@ -4,11 +4,9 @@ use blue_engine::{
     wgpu, KeyCode, ObjectSettings, ShaderSettings,
 };
 use clap::Parser;
-use geonum_common::FromCSV as _;
-use render::IntoMesh;
+use geonum_common::{FromCSV as _, IntoMesh as _};
 
 mod bezier_surface;
-mod render;
 
 const MOVE_SPEED: f32 = 10.0;
 const COLORS: [(f32, f32, f32, f32); 6] = [

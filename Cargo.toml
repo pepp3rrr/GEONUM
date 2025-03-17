@@ -6,4 +6,5 @@ members = ["common", "tp1", "tp2", "tp4", "tp5", "tp6"]
 clap = { version = "4.5", features = ["derive"] }
 csv = "1.3"
 plotters = "0.3"
+blue_engine = "0.6"
 

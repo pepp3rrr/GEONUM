@@ -3,6 +3,10 @@ name = "geonum-common"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+3d = ["dep:blue_engine"]
+
 [dependencies]
 csv = { workspace = true }
+blue_engine = { workspace = true, optional = true }
 

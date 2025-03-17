@@ -1,5 +1,5 @@
+use crate::types::Point;
 use blue_engine::{UnsignedIntType, Vector2, Vector3, Vertex};
-use geonum_common::Point;
 
 type Mesh = (Vec<Vertex>, Vec<UnsignedIntType>);
 
