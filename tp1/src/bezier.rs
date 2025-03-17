@@ -17,7 +17,7 @@ impl<const D: usize> Bezier<D> {
             return self.control.pop().expect("Should not be empty");
         }
 
-        let mut new = Vec::<Point<D>>::new();
+        let mut new = Vec::<Point<D>>::with_capacity(n - 1);
         for k in 1..n {
             let a = self.control.get(k - 1).unwrap().clone();
             let b = self.control.get(k).unwrap().clone();
