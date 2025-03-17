@@ -2719,6 +2719,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "tp3-bspline"
+version = "0.1.0"
+dependencies = [
+ "geonum-common",
+]
+
+[[package]]
 name = "tp4-subdivision"
 version = "0.1.0"
 dependencies = [
