@@ -2722,7 +2722,9 @@ dependencies = [
 name = "tp3-bspline"
 version = "0.1.0"
 dependencies = [
+ "clap",
  "geonum-common",
+ "plotters",
 ]
 
 [[package]]
