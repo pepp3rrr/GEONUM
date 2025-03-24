@@ -6,6 +6,34 @@ pub struct SubdivisionSurface {
     pub closed_y: bool,
 }
 
+impl SubdivisionSurface {
+    pub fn compute(&self, steps: u16) -> Vec<Vec<Point<3>>> {
+        // Subdivide the X axis (lines)
+        let curves_x = self
+            .control
+            .iter()
+            .map(|points| {
+                tp4_subdivision::SubdivisionCurve::<3> {
+                    control: points.clone(),
+                }
+                .compute(tp4_subdivision::ComputeMethod::Chaikin, steps)
+            })
+            .collect::<Vec<_>>();
+
+        let mut curves_y = Vec::new();
+        let x_dim = curves_x.first().unwrap().len();
+        for x in 0..x_dim {
+            let control = curves_x.iter().map(|line| line[x]).collect();
+            curves_y.push(tp4_subdivision::SubdivisionCurve::<3> { control });
+        }
+
+        curves_y
+            .into_iter()
+            .map(|column| column.compute(tp4_subdivision::ComputeMethod::Chaikin, steps))
+            .collect()
+    }
+}
+
 impl FromCSV for SubdivisionSurface {
     fn read(mut reader: geonum_common::CSVReader) -> Self {
         assert!(reader.has_headers());
