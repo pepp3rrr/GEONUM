@@ -2,6 +2,8 @@ use geonum_common::{FromCSV, Point};
 
 pub struct SubdivisionSurface {
     pub control: Vec<Vec<Point<3>>>,
+    pub closed_x: bool,
+    pub closed_y: bool,
 }
 
 impl FromCSV for SubdivisionSurface {
@@ -10,6 +12,8 @@ impl FromCSV for SubdivisionSurface {
         let header = reader.headers().unwrap();
         let degree_x: usize = header.get(0).unwrap().parse().unwrap();
         let degree_y: usize = header.get(1).unwrap().parse().unwrap();
+        let closed_x: bool = header.get(2).unwrap().parse::<u8>().unwrap() == 1;
+        let closed_y: bool = header.get(3).unwrap().parse::<u8>().unwrap() == 1;
 
         let mut control_net = Vec::with_capacity(degree_y);
 
@@ -30,6 +34,8 @@ impl FromCSV for SubdivisionSurface {
 
         Self {
             control: control_net,
+            closed_x,
+            closed_y,
         }
     }
 }
