@@ -1,8 +1,8 @@
 use geonum_common::{BoundingBox, FromCSV, Point};
 
 #[derive(Clone)]
-pub struct SubdivisionCurve {
-    pub control: Vec<Point>,
+pub struct SubdivisionCurve<const D: usize = 2> {
+    pub control: Vec<Point<D>>,
 }
 
 pub enum ComputeMethod {
@@ -11,8 +11,8 @@ pub enum ComputeMethod {
     FourPoint { w: f32 },
 }
 
-impl SubdivisionCurve {
-    pub fn compute(&self, method: ComputeMethod, steps: u16) -> Vec<Point> {
+impl<const D: usize> SubdivisionCurve<D> {
+    pub fn compute(&self, method: ComputeMethod, steps: u16) -> Vec<Point<D>> {
         let worker = self.clone();
 
         match method {
@@ -27,11 +27,11 @@ impl SubdivisionCurve {
         }
     }
 
-    fn compute_chaikin(self, steps: u16) -> Vec<Point> {
+    fn compute_chaikin(self, steps: u16) -> Vec<Point<D>> {
         self.compute_corner_cutting(steps, 0.25, 0.75)
     }
 
-    fn compute_corner_cutting(self, steps: u16, a: f32, b: f32) -> Vec<Point> {
+    fn compute_corner_cutting(self, steps: u16, a: f32, b: f32) -> Vec<Point<D>> {
         assert!(0.0 < a && a < b && b < 1.0);
 
         if steps == 0 {
@@ -39,7 +39,7 @@ impl SubdivisionCurve {
         }
 
         let n = self.control.len();
-        let mut new = Vec::<Point>::with_capacity(2 * n);
+        let mut new = Vec::<Point<D>>::with_capacity(2 * n);
 
         for i in 0..n {
             let xi = self.control[i];
@@ -57,13 +57,13 @@ impl SubdivisionCurve {
         SubdivisionCurve { control: new }.compute_corner_cutting(steps - 1, a, b)
     }
 
-    fn compute_four_point(self, steps: u16, w: f32) -> Vec<Point> {
+    fn compute_four_point(self, steps: u16, w: f32) -> Vec<Point<D>> {
         if steps == 0 {
             return self.control;
         }
 
         let n = self.control.len();
-        let mut new = Vec::<Point>::with_capacity(2 * n);
+        let mut new = Vec::<Point<D>>::with_capacity(2 * n);
 
         for i in 0..n {
             let xi_m1 = if i != 0 {

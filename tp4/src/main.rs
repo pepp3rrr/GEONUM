@@ -1,9 +1,7 @@
 use clap::{Parser, ValueEnum};
 use geonum_common::{BoundingBox as _, FromCSV};
 use plotters::{element::DashedPathElement, prelude::*};
-use subdivision::{ComputeMethod, SubdivisionCurve};
-
-mod subdivision;
+use tp4_subdivision::*;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
