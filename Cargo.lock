@@ -2752,7 +2752,10 @@ dependencies = [
 name = "tp8-subdivision-surface"
 version = "0.1.0"
 dependencies = [
+ "blue_engine",
+ "clap",
  "geonum-common",
+ "tp4-subdivision",
 ]
 
 [[package]]
