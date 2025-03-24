@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["common", "tp1", "tp2", "tp4", "tp5", "tp6"]
+members = ["common", "tp1", "tp2", "tp4", "tp5", "tp6", "tp8"]
 
 [workspace.dependencies]
 clap = { version = "4.5", features = ["derive"] }
