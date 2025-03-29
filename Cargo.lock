@@ -2755,7 +2755,6 @@ dependencies = [
  "blue_engine",
  "clap",
  "geonum-common",
- "tp4-subdivision",
 ]
 
 [[package]]

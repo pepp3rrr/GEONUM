@@ -1,5 +1,6 @@
 use geonum_common::{FromCSV, Point};
 
+#[derive(Clone)]
 pub struct SubdivisionSurface {
     pub control: Vec<Vec<Point<3>>>,
     pub closed_x: bool,
@@ -8,29 +9,64 @@ pub struct SubdivisionSurface {
 
 impl SubdivisionSurface {
     pub fn compute(&self, steps: u16) -> Vec<Vec<Point<3>>> {
-        // Subdivide the X axis (lines)
-        let curves_x = self
-            .control
-            .iter()
-            .map(|points| {
-                tp4_subdivision::SubdivisionCurve::<3> {
-                    control: points.clone(),
-                }
-                .compute(tp4_subdivision::ComputeMethod::Chaikin, steps)
-            })
-            .collect::<Vec<_>>();
+        self.clone().compute_worker(steps)
+    }
 
-        let mut curves_y = Vec::new();
-        let x_dim = curves_x.first().unwrap().len();
-        for x in 0..x_dim {
-            let control = curves_x.iter().map(|line| line[x]).collect();
-            curves_y.push(tp4_subdivision::SubdivisionCurve::<3> { control });
+    fn compute_worker(self, steps: u16) -> Vec<Vec<Point<3>>> {
+        if steps == 0 {
+            return self.control;
         }
 
-        curves_y
-            .into_iter()
-            .map(|column| column.compute(tp4_subdivision::ComputeMethod::Chaikin, steps))
-            .collect()
+        let h = self.control.len();
+
+        // Duplication
+        let mut new = Vec::with_capacity(h * 2);
+        for line in self.control.iter() {
+            let mut new_row = Vec::with_capacity(2 * line.len());
+            for point in line {
+                // Cloning point data is kinda useless
+                new_row.push(point.clone());
+                new_row.push(point.clone());
+            }
+            new.push(new_row.clone());
+            new.push(new_row);
+        }
+
+        for (i, line) in self.control.iter().enumerate() {
+            let w = line.len();
+
+            for j in 0..w {
+                if self.closed_y && i + 1 == h || self.closed_x && j + 1 == w {
+                    continue;
+                }
+
+                let v_i_j = self.control[i][j];
+                let v_ip1_j = self.control[(i + 1) % h][j];
+                let v_i_jp1 = self.control[i][(j + 1) % w];
+                let v_ip1_jp1 = self.control[(i + 1) % h][(j + 1) % w];
+
+                let v_2i_2j =
+                    1.0 / 16.0 * (9.0 * v_i_j + 3.0 * v_ip1_j + 3.0 * v_i_jp1 + 1.0 * v_ip1_jp1);
+                let v_2ip1_2j =
+                    1.0 / 16.0 * (3.0 * v_i_j + 9.0 * v_ip1_j + 1.0 * v_i_jp1 + 3.0 * v_ip1_jp1);
+                let v_2i_2jp1 =
+                    1.0 / 16.0 * (3.0 * v_i_j + 1.0 * v_ip1_j + 9.0 * v_i_jp1 + 3.0 * v_ip1_jp1);
+                let v_2ip1_2jp1 =
+                    1.0 / 16.0 * (1.0 * v_i_j + 3.0 * v_ip1_j + 3.0 * v_i_jp1 + 9.0 * v_ip1_jp1);
+
+                new[2 * i][2 * j] = v_2i_2j.into_point();
+                new[2 * i + 1][2 * j] = v_2ip1_2j.into_point();
+                new[2 * i][2 * j + 1] = v_2i_2jp1.into_point();
+                new[2 * i + 1][2 * j + 1] = v_2ip1_2jp1.into_point();
+            }
+        }
+
+        SubdivisionSurface {
+            control: new,
+            closed_x: self.closed_x,
+            closed_y: self.closed_y,
+        }
+        .compute_worker(steps - 1)
     }
 }
 
