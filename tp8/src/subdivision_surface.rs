@@ -9,7 +9,19 @@ pub struct SubdivisionSurface {
 
 impl SubdivisionSurface {
     pub fn compute(&self, steps: u16) -> Vec<Vec<Point<3>>> {
-        self.clone().compute_worker(steps)
+        let mut out = self.clone().compute_worker(steps);
+
+        if self.closed_x {
+            for line in out.iter_mut() {
+                line.push(line.first().cloned().unwrap());
+            }
+        }
+
+        if self.closed_y {
+            out.push(out.first().cloned().unwrap());
+        }
+
+        return out;
     }
 
     fn compute_worker(self, steps: u16) -> Vec<Vec<Point<3>>> {
