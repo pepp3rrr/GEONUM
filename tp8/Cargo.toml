@@ -1,0 +1,9 @@
+[package]
+name = "tp8-subdivision-surface"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+geonum-common = { path = "../common", features = ["3d"] }
+clap = { workspace = true, features = ["derive"] }
+blue_engine = { workspace = true }
