@@ -24,6 +24,10 @@ struct Args {
     /// Draw in wireframe mode
     #[arg(short, long)]
     wireframe: bool,
+
+    /// Wether to draw intermediate control polygons
+    #[arg(short, long)]
+    draw_control: bool,
 }
 
 fn main() {
@@ -54,6 +58,29 @@ fn main() {
         },
         &mut engine.renderer,
     );
+
+    if args.draw_control {
+        let (vertices, indices) = surface.control.into_mesh();
+        engine.objects.new_object(
+            "control",
+            vertices,
+            indices,
+            ObjectSettings {
+                shader_settings: ShaderSettings {
+                    polygon_mode: wgpu::PolygonMode::Line,
+                    cull_mode: None,
+                    ..Default::default()
+                },
+                ..Default::default()
+            },
+            &mut engine.renderer,
+        );
+        engine
+            .objects
+            .get_mut("control")
+            .unwrap()
+            .set_color(1.0, 0.0, 0.0, 0.6);
+    }
 
     let mut radius = 10.0;
 
