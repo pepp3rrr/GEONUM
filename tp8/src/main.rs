@@ -25,7 +25,7 @@ struct Args {
     #[arg(short, long)]
     wireframe: bool,
 
-    /// Wether to draw intermediate control polygons
+    /// Whether to draw intermediate control polygons
     #[arg(short, long)]
     draw_control: bool,
 }
