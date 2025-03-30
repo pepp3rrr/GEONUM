@@ -11,13 +11,13 @@ impl SubdivisionSurface {
     pub fn compute(&self, steps: u16) -> Vec<Vec<Point<3>>> {
         let mut out = self.clone().compute_worker(steps);
 
-        if self.closed_x {
+        if self.closed_y {
             for line in out.iter_mut() {
                 line.push(line.first().cloned().unwrap());
             }
         }
 
-        if self.closed_y {
+        if self.closed_x {
             out.push(out.first().cloned().unwrap());
         }
 
