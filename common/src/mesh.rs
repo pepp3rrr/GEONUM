@@ -1,7 +1,7 @@
 use crate::types::Point;
 use blue_engine::{UnsignedIntType, Vector2, Vector3, Vertex};
 
-type Mesh = (Vec<Vertex>, Vec<UnsignedIntType>);
+pub type Mesh = (Vec<Vertex>, Vec<UnsignedIntType>);
 
 pub trait IntoMesh {
     fn into_mesh(self) -> Mesh;
