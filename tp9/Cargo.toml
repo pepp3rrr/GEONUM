@@ -5,4 +5,5 @@ edition = "2024"
 
 [dependencies]
 geonum-common = { path = "../common" }
+blue_engine = { workspace = true }
 

@@ -2761,6 +2761,7 @@ dependencies = [
 name = "tp9-subdivision-triangle"
 version = "0.1.0"
 dependencies = [
+ "blue_engine",
  "geonum-common",
 ]
 
