@@ -2758,6 +2758,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "tp9-subdivision-triangle"
+version = "0.1.0"
+dependencies = [
+ "geonum-common",
+]
+
+[[package]]
 name = "tracing"
 version = "0.1.41"
 source = "registry+https://github.com/rust-lang/crates.io-index"

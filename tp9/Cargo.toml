@@ -1,0 +1,8 @@
+[package]
+name = "tp9-subdivision-triangle"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+geonum-common = { path = "../common" }
+
