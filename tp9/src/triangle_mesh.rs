@@ -1,9 +1,33 @@
-use geonum_common::{FromCSV, Point};
+use blue_engine::{Vector2, Vector3, Vertex};
+use geonum_common::{FromCSV, IntoMesh, Mesh, Point};
 
 #[derive(Debug)]
 pub struct TriangleMesh {
     vertices: Vec<Point<3>>,
     indices: Vec<(usize, usize, usize)>,
+}
+
+impl IntoMesh for TriangleMesh {
+    fn into_mesh(self) -> Mesh {
+        let mut vertices = Vec::new();
+        let mut indices = Vec::new();
+
+        for vertex in self.vertices.into_iter() {
+            vertices.push(Vertex {
+                position: Vector3::new(vertex.x(), vertex.z(), vertex.y()),
+                uv: Vector2::ZERO,
+                normal: Vector3::ZERO,
+            });
+        }
+
+        for index in self.indices {
+            indices.push(index.0 as u16);
+            indices.push(index.1 as u16);
+            indices.push(index.2 as u16);
+        }
+
+        (vertices, indices)
+    }
 }
 
 impl FromCSV for TriangleMesh {
