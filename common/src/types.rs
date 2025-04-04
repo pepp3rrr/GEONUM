@@ -12,6 +12,7 @@ pub struct Vector<const D: usize = 2> {
     pub coords: Coords<D>,
 }
 
+#[derive(Debug)]
 pub struct PointComb<const D: usize = 2> {
     point: Point<D>,
     factor: f32,
@@ -92,10 +93,13 @@ impl Vector<3> {
 impl<const D: usize> PointComb<D> {
     /// Tries to apply the affine combination to return a valid Point. Panics if ∑ factors != 1.0
     pub fn into_point(self) -> Point<D> {
+        const PRECISION: f32 = 1024.0;
+        let rounded_factor = (self.factor * PRECISION).round() / PRECISION;
+
         assert_eq!(
-            self.factor, 1.0,
+            rounded_factor, 1.0,
             "Not an affine combination, sum of factors: {}",
-            self.factor
+            rounded_factor
         );
         self.point
     }
