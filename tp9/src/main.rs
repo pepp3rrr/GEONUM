@@ -1,4 +1,5 @@
 use blue_engine::header::*;
+use clap::Parser;
 use geonum_common::{FromCSV as _, IntoMesh};
 use triangle_mesh::TriangleMesh;
 
@@ -6,11 +7,29 @@ mod triangle_mesh;
 
 const MOVE_SPEED: f32 = 10.0;
 
+#[derive(Parser, Debug)]
+#[command(version, about, long_about = None)]
+struct Args {
+    /// The path of the OFF file to plot
+    #[arg()]
+    off_path: String,
+
+    /// Number of subdivision steps (per axis)
+    #[arg(short, long, default_value_t = 2)]
+    steps: u16,
+
+    /// Draw in wireframe mode
+    #[arg(short, long)]
+    wireframe: bool,
+}
+
 fn main() {
+    let args = Args::parse();
+
     let mut engine =
         Engine::new_config(WindowDescriptor::default()).expect("Couldn't init the Engine");
 
-    let mesh = TriangleMesh::from_csv("tp9/data/cube.off").subdivide(1);
+    let mesh = TriangleMesh::from_csv(args.off_path).subdivide(args.steps);
 
     let (vertices, indices) = mesh.into_mesh();
     engine.objects.new_object(
@@ -19,7 +38,11 @@ fn main() {
         indices,
         ObjectSettings {
             shader_settings: ShaderSettings {
-                polygon_mode: wgpu::PolygonMode::Line,
+                polygon_mode: if args.wireframe {
+                    wgpu::PolygonMode::Line
+                } else {
+                    Default::default()
+                },
                 cull_mode: None,
                 ..Default::default()
             },

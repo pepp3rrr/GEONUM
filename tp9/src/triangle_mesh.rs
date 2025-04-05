@@ -13,7 +13,7 @@ pub struct TriangleMesh {
 }
 
 impl TriangleMesh {
-    pub fn subdivide(self, n: u32) -> Self {
+    pub fn subdivide(self, n: u16) -> Self {
         if n == 0 {
             return self;
         }

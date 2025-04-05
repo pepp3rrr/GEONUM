@@ -6,4 +6,5 @@ edition = "2024"
 [dependencies]
 geonum-common = { path = "../common", features = ["3d"] }
 blue_engine = { workspace = true }
+clap = { workspace = true }
 
