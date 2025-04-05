@@ -5,7 +5,7 @@ use triangle_mesh::{TriangleMesh, WeightMethod};
 
 mod triangle_mesh;
 
-const MOVE_SPEED: f32 = 10.0;
+const MOVE_SPEED: f32 = 5.0;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
