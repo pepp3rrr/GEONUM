@@ -30,14 +30,15 @@ impl TriangleMesh {
         // Compute new midpoint vertices for each unique edge
         let mut visited_edges = HashMap::<Edge, usize>::new();
         for face in &self.indices {
-            let a = (face.0, face.1);
-            let b = (face.1, face.2);
-            let c = (face.2, face.0);
+            let a = (face.0.min(face.1), face.0.max(face.1));
+            let b = (face.1.min(face.2), face.1.max(face.2));
+            let c = (face.2.min(face.0), face.2.max(face.0));
 
             let new_points = [a, b, c].map(|edge| {
                 if visited_edges.contains_key(&edge) {
                     return visited_edges.get(&edge).cloned().unwrap();
                 }
+                debug_assert!(!visited_edges.contains_key(&(edge.1, edge.0)));
 
                 let edge_points = (self.vertices[edge.0], self.vertices[edge.1]);
                 let adjacent_faces = self.get_adjacent_faces(&edge);
