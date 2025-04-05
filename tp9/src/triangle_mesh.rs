@@ -10,6 +10,14 @@ type Face = (usize, usize, usize);
 pub struct TriangleMesh {
     vertices: Vec<Point<3>>,
     indices: Vec<Face>,
+    pub weight_method: WeightMethod,
+}
+
+#[derive(Default, Debug, Clone, Copy)]
+pub enum WeightMethod {
+    #[default]
+    Beta,
+    Warren,
 }
 
 impl TriangleMesh {
@@ -103,7 +111,18 @@ impl TriangleMesh {
                     .collect::<Vec<_>>();
 
                 let n = neighbours.len() as f32;
-                let beta = 1. / n * (5. / 8. - (3. / 8. + 1. / 4. * (2. * PI / n).cos()).powi(2));
+                let beta = match self.weight_method {
+                    WeightMethod::Beta => {
+                        1. / n * (5. / 8. - (3. / 8. + 1. / 4. * (2. * PI / n).cos()).powi(2))
+                    }
+                    WeightMethod::Warren => {
+                        if n > 3.0 {
+                            3. / (8. * n)
+                        } else {
+                            3. / 16.
+                        }
+                    }
+                };
 
                 neighbours
                     .into_iter()
@@ -118,6 +137,7 @@ impl TriangleMesh {
         Self {
             vertices: final_vertices,
             indices: new_indices,
+            weight_method: self.weight_method,
         }
     }
 
@@ -191,6 +211,10 @@ impl FromCSV for TriangleMesh {
             indices.push((a, b, c));
         }
 
-        Self { vertices, indices }
+        Self {
+            vertices,
+            indices,
+            weight_method: Default::default(),
+        }
     }
 }
