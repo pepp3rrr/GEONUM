@@ -22,6 +22,7 @@ impl TriangleMesh {
         let mut new_vertices = Vec::new();
         let mut new_indices = Vec::with_capacity(m * 4);
 
+        // Compute new midpoint vertices for each unique edge
         let mut visited_edges = HashMap::<Edge, usize>::new();
         for face in &self.indices {
             let a = (face.0, face.1);
@@ -64,14 +65,17 @@ impl TriangleMesh {
                 midpoint_index
             });
 
+            // Construct new triangles for the old face
             new_indices.push((new_points[0], new_points[2], face.0));
             new_indices.push((new_points[1], new_points[0], face.1));
             new_indices.push((new_points[2], new_points[1], face.2));
             new_indices.push((new_points[0], new_points[1], new_points[2]));
         }
 
+        // Contains a list of each unique edge in our mesh
         let edges = visited_edges.into_keys().collect::<Vec<_>>();
 
+        // Update old vertices positions and append new vertices
         let final_vertices = self
             .vertices
             .clone()
