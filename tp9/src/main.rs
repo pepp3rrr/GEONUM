@@ -10,7 +10,7 @@ fn main() {
     let mut engine =
         Engine::new_config(WindowDescriptor::default()).expect("Couldn't init the Engine");
 
-    let mesh = TriangleMesh::from_csv("tp9/data/cube.off").subdivide();
+    let mesh = TriangleMesh::from_csv("tp9/data/cube.off").subdivide(1);
 
     let (vertices, indices) = mesh.into_mesh();
     engine.objects.new_object(

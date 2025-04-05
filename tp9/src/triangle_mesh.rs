@@ -1,7 +1,4 @@
-use std::{
-    collections::{HashMap, HashSet},
-    f32::consts::PI,
-};
+use std::{collections::HashMap, f32::consts::PI};
 
 use blue_engine::{Vector2, Vector3, Vertex};
 use geonum_common::{FromCSV, IntoMesh, Mesh, Point};
@@ -16,7 +13,15 @@ pub struct TriangleMesh {
 }
 
 impl TriangleMesh {
-    pub fn subdivide(&self) -> Self {
+    pub fn subdivide(self, n: u32) -> Self {
+        if n == 0 {
+            return self;
+        }
+
+        return self.subdivide_worker().subdivide(n - 1);
+    }
+
+    fn subdivide_worker(&self) -> Self {
         let m = self.indices.len();
         let mut n = self.vertices.len();
         let mut new_vertices = Vec::new();
