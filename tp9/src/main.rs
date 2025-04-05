@@ -1,7 +1,7 @@
 use blue_engine::header::*;
-use clap::Parser;
+use clap::{Parser, ValueEnum};
 use geonum_common::{FromCSV as _, IntoMesh};
-use triangle_mesh::TriangleMesh;
+use triangle_mesh::{TriangleMesh, WeightMethod};
 
 mod triangle_mesh;
 
@@ -18,9 +18,21 @@ struct Args {
     #[arg(short, long, default_value_t = 2)]
     steps: u16,
 
+    /// Weight compute method
+    #[arg(short, long, default_value_t, value_enum)]
+    method: Method,
+
     /// Draw in wireframe mode
     #[arg(short, long)]
     wireframe: bool,
+}
+
+#[derive(ValueEnum, Default, Debug, Clone, serde::Serialize)]
+#[serde(rename_all = "kebab-case")]
+enum Method {
+    #[default]
+    Beta,
+    Warren,
 }
 
 fn main() {
@@ -29,7 +41,13 @@ fn main() {
     let mut engine =
         Engine::new_config(WindowDescriptor::default()).expect("Couldn't init the Engine");
 
-    let mesh = TriangleMesh::from_csv(args.off_path).subdivide(args.steps);
+    let mut mesh = TriangleMesh::from_csv(args.off_path);
+    mesh.weight_method = match args.method {
+        Method::Beta => WeightMethod::Beta,
+        Method::Warren => WeightMethod::Warren,
+    };
+
+    let mesh = mesh.subdivide(args.steps);
 
     let (vertices, indices) = mesh.into_mesh();
     engine.objects.new_object(

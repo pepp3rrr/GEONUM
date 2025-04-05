@@ -7,4 +7,5 @@ edition = "2024"
 geonum-common = { path = "../common", features = ["3d"] }
 blue_engine = { workspace = true }
 clap = { workspace = true }
+serde = { version = "1.0.218", features = ["derive"] }
 

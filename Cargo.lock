@@ -2764,6 +2764,7 @@ dependencies = [
  "blue_engine",
  "clap",
  "geonum-common",
+ "serde",
 ]
 
 [[package]]
