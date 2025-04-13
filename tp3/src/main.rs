@@ -46,10 +46,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     chart
         .draw_series(LineSeries::new(
-            spline
-                .sample(args.samples)
-                .into_iter()
-                .map(|p| (p.x(), p.y())),
+            (0..=args.samples)
+                .map(|x| x as f32 / (args.samples as f32))
+                .map(|x| {
+                    let result = spline.evaluate(x);
+                    (result.x(), result.y())
+                }),
             &RED,
         ))?
         .label(args.bspline_path);

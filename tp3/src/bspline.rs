@@ -8,44 +8,33 @@ pub struct BSpline {
 }
 
 impl BSpline {
-    pub fn sample(&self, density: usize) -> Vec<Point> {
-        let mut out = Vec::new();
+    pub fn evaluate(&self, t: f32) -> Point {
+        // Normalize to max knot
+        let t = t * self.knots.last().unwrap() * 0.99;
 
-        for j in self.degree..(self.knots.len() - self.degree) {
-            // Skip identical
-            if self.knots[j] == self.knots[j + 1] {
-                continue;
+        let k = self.degree;
+        let i = (0..(self.knots.len() - 1))
+            .find(|i| self.knots[*i] <= t && t < self.knots[i + 1])
+            .unwrap();
+
+        let mut d = (0..(k + 1))
+            .map(|j| self.control[j + i - k])
+            .collect::<Vec<_>>();
+
+        for r in 1..(k + 1) {
+            for j in (r..k + 1).rev() {
+                let denominator = self.knots[j + 1 + k - r] - self.knots[j + i - k];
+                let alpha = if denominator != 0.0 {
+                    (t - self.knots[j + i - k]) / denominator
+                } else {
+                    0.0
+                };
+
+                d[j] = ((1.0 - alpha) * d[j - 1] + alpha * d[j]).into_point();
             }
-
-            let mut new = (0..density)
-                .map(|n| {
-                    let k = self.knots[j] + (n as f32 / density as f32) * self.knots[j + 1];
-                    self.compute_worker(self.degree, j, k)
-                })
-                .collect::<Vec<_>>();
-
-            out.append(&mut new);
         }
 
-        out
-    }
-
-    fn compute_worker(&self, r: usize, j: usize, t: f32) -> Point {
-        if r == 0 {
-            return self.control[j];
-        }
-
-        let d = self.knots[j + self.degree - (r - 1)] - self.knots[j];
-        let w = if d == 0.0 {
-            0.0
-        } else {
-            (t - self.knots[j]) / d
-        };
-
-        let d_jm1 = self.compute_worker(r - 1, j - 1, t);
-        let d_j = self.compute_worker(r - 1, j, t);
-
-        ((1.0 - w) * d_jm1 + w * d_j).into_point()
+        d[k]
     }
 }
 
