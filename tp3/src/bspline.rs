@@ -1,14 +1,14 @@
 use geonum_common::{FromCSV, Point};
 
 #[derive(Debug)]
-pub struct BSpline {
+pub struct BSpline<const D: usize = 2> {
     pub degree: usize,
-    pub control: Vec<Point>,
+    pub control: Vec<Point<D>>,
     pub knots: Vec<f32>,
 }
 
-impl BSpline {
-    pub fn evaluate(&self, density: usize) -> Vec<Vec<Point>> {
+impl<const D: usize> BSpline<D> {
+    pub fn evaluate(&self, density: usize) -> Vec<Vec<Point<D>>> {
         let mut out = Vec::new();
 
         for j in self.degree..(self.knots.len() - self.degree) {
@@ -29,7 +29,7 @@ impl BSpline {
         out
     }
 
-    fn de_boor(&self, r: usize, j: usize, t: f32) -> Point {
+    fn de_boor(&self, r: usize, j: usize, t: f32) -> Point<D> {
         if r == 0 {
             return self.control[j];
         }
