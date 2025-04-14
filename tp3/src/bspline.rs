@@ -48,6 +48,7 @@ impl BSpline {
     }
 }
 
+// https://stackoverflow.com/a/70840233
 pub fn linspace(x0: f32, xend: f32, n: usize) -> Vec<f32> {
     let to_float = |i: usize| i as f32;
     let dx = (xend - x0) / to_float(n - 1);
