@@ -23,7 +23,7 @@ struct Args {
     #[arg(short, long, default_value_t = 100)]
     samples: usize,
 
-    /// Wether to draw intermediate control polygons
+    /// Whether to draw intermediate control polygons
     #[arg(short, long)]
     draw_control: bool,
 }
