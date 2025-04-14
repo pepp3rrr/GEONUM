@@ -30,6 +30,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
 
     let spline = BSpline::from_csv(&args.bspline_path);
+    let points = spline.evaluate(args.samples);
     let bb = spline.control.bounding_box();
 
     let root = SVGBackend::new(&args.output, (1080, 720)).into_drawing_area();
@@ -44,17 +45,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     chart.configure_mesh().draw()?;
 
-    chart
-        .draw_series(LineSeries::new(
-            (0..=args.samples)
-                .map(|x| x as f32 / (args.samples as f32))
-                .map(|x| {
-                    let result = spline.evaluate(x);
-                    (result.x(), result.y())
-                }),
+    for segment in points {
+        chart.draw_series(LineSeries::new(
+            segment
+                .into_iter()
+                .map(|p| (p.x(), p.y()))
+                .collect::<Vec<_>>(),
             &RED,
-        ))?
-        .label(args.bspline_path);
+        ))?;
+    }
 
     if args.draw_control {
         root.draw(&DashedPathElement::new(

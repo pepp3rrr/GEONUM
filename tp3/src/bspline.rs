@@ -8,34 +8,50 @@ pub struct BSpline {
 }
 
 impl BSpline {
-    pub fn evaluate(&self, t: f32) -> Point {
-        // Normalize to max knot
-        let t = t * self.knots.last().unwrap() * 0.99;
+    pub fn evaluate(&self, density: usize) -> Vec<Vec<Point>> {
+        let mut out = Vec::new();
 
-        let k = self.degree;
-        let i = (0..(self.knots.len() - 1))
-            .find(|i| self.knots[*i] <= t && t < self.knots[i + 1])
-            .unwrap();
-
-        let mut d = (0..(k + 1))
-            .map(|j| self.control[j + i - k])
-            .collect::<Vec<_>>();
-
-        for r in 1..(k + 1) {
-            for j in (r..k + 1).rev() {
-                let denominator = self.knots[j + 1 + k - r] - self.knots[j + i - k];
-                let alpha = if denominator != 0.0 {
-                    (t - self.knots[j + i - k]) / denominator
-                } else {
-                    0.0
-                };
-
-                d[j] = ((1.0 - alpha) * d[j - 1] + alpha * d[j]).into_point();
+        for j in self.degree..(self.knots.len() - self.degree) {
+            if self.knots[j] == self.knots[j + 1] {
+                continue;
             }
+
+            let t_values = linspace(self.knots[j], self.knots[j + 1], density);
+
+            let mut segment = Vec::with_capacity(t_values.len());
+            for t in t_values {
+                segment.push(self.de_boor(self.degree, j, t));
+            }
+
+            out.push(segment);
         }
 
-        d[k]
+        out
     }
+
+    fn de_boor(&self, r: usize, j: usize, t: f32) -> Point {
+        if r == 0 {
+            return self.control[j];
+        }
+
+        let denominator = self.knots[j + self.degree - (r - 1)] - self.knots[j];
+        let omega = if denominator != 0.0 {
+            (t - self.knots[j]) / denominator
+        } else {
+            0.0
+        };
+
+        let dj = self.de_boor(r - 1, j - 1, t);
+        let dj_m1 = self.de_boor(r - 1, j, t);
+
+        ((1.0 - omega) * dj + omega * dj_m1).into_point()
+    }
+}
+
+pub fn linspace(x0: f32, xend: f32, n: usize) -> Vec<f32> {
+    let to_float = |i: usize| i as f32;
+    let dx = (xend - x0) / to_float(n - 1);
+    (0..n).map(|i| x0 + to_float(i) * dx).collect()
 }
 
 impl FromCSV for BSpline {
