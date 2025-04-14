@@ -60,7 +60,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             (spline_2d, control_2d)
         }
-        _ => unimplemented!("Invalid file extention"),
+        _ => unimplemented!("Invalid file extension"),
     };
 
     let bb = control.bounding_box();
