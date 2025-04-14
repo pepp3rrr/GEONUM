@@ -1,5 +1,5 @@
 use clap::Parser;
-use geonum_common::{BoundingBox, FromCSV};
+use geonum_common::{BoundingBox, FromCSV, Point};
 use plotters::{element::DashedPathElement, prelude::*};
 
 mod bspline;
@@ -11,9 +11,9 @@ const COLORS: [RGBColor; 6] = [RED, GREEN, BLUE, YELLOW, CYAN, MAGENTA];
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 struct Args {
-    /// The path of the BSpline file to plot
+    /// The path of the BSpline or NURBS file to plot
     #[arg()]
-    bspline_path: String,
+    spline_path: String,
 
     /// The output path of the plotted image
     #[arg(short, long)]
@@ -31,9 +31,39 @@ struct Args {
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
 
-    let spline = BSpline::from_csv(&args.bspline_path);
-    let result = spline.evaluate(args.samples);
-    let bb = spline.control.bounding_box();
+    let extension = std::path::Path::new(&args.spline_path)
+        .extension()
+        .and_then(|ext| ext.to_str())
+        .expect("Invalid file path");
+
+    let (spline, control) = match extension {
+        "bspline" => {
+            let spline = BSpline::<2>::from_csv(&args.spline_path);
+            (spline.evaluate(args.samples), spline.control)
+        }
+        "nurbs" => {
+            let spline = BSpline::<3>::from_csv(&args.spline_path);
+            let control_2d = spline
+                .control
+                .iter()
+                .map(|c| Point::<2>::new(c.x(), c.y()))
+                .collect::<Vec<_>>();
+            let spline_2d = spline
+                .evaluate(args.samples)
+                .iter()
+                .map(|v| {
+                    v.iter()
+                        .map(|p| Point::<2>::new(p.x(), p.y()))
+                        .collect::<Vec<_>>()
+                })
+                .collect::<Vec<_>>();
+
+            (spline_2d, control_2d)
+        }
+        _ => unimplemented!("Invalid file extention"),
+    };
+
+    let bb = control.bounding_box();
 
     let root = SVGBackend::new(&args.output, (1080, 720)).into_drawing_area();
     root.fill(&WHITE)?;
@@ -47,7 +77,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     chart.configure_mesh().draw()?;
 
-    for (i, segment) in result.into_iter().enumerate() {
+    for (i, segment) in spline.into_iter().enumerate() {
         chart.draw_series(LineSeries::new(
             segment
                 .into_iter()
@@ -59,31 +89,24 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     if args.draw_control {
         root.draw(&DashedPathElement::new(
-            spline
-                .control
-                .iter()
-                .map(|p| chart.backend_coord(&(p.x(), p.y()))),
+            control.iter().map(|p| chart.backend_coord(&(p.x(), p.y()))),
             4,
             2,
             &BLACK,
         ))?;
 
-        spline
-            .control
-            .iter()
-            .enumerate()
-            .for_each(|(index, point)| {
-                root.draw(&Circle::new(
-                    chart.backend_coord(&(point.x(), point.y())),
-                    if index == 0 || index == (spline.control.len() - 1) {
-                        5
-                    } else {
-                        3
-                    },
-                    Into::<ShapeStyle>::into(&BLACK).filled(),
-                ))
-                .unwrap();
-            });
+        control.iter().enumerate().for_each(|(index, point)| {
+            root.draw(&Circle::new(
+                chart.backend_coord(&(point.x(), point.y())),
+                if index == 0 || index == (control.len() - 1) {
+                    5
+                } else {
+                    3
+                },
+                Into::<ShapeStyle>::into(&BLACK).filled(),
+            ))
+            .unwrap();
+        });
     }
 
     chart
