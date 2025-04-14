@@ -6,6 +6,8 @@ mod bspline;
 
 use bspline::BSpline;
 
+const COLORS: [RGBColor; 6] = [RED, GREEN, BLUE, YELLOW, CYAN, MAGENTA];
+
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 struct Args {
@@ -30,7 +32,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
 
     let spline = BSpline::from_csv(&args.bspline_path);
-    let points = spline.evaluate(args.samples);
+    let result = spline.evaluate(args.samples);
     let bb = spline.control.bounding_box();
 
     let root = SVGBackend::new(&args.output, (1080, 720)).into_drawing_area();
@@ -45,13 +47,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     chart.configure_mesh().draw()?;
 
-    for segment in points {
+    for (i, segment) in result.into_iter().enumerate() {
         chart.draw_series(LineSeries::new(
             segment
                 .into_iter()
                 .map(|p| (p.x(), p.y()))
                 .collect::<Vec<_>>(),
-            &RED,
+            COLORS[i % COLORS.len()],
         ))?;
     }
 
